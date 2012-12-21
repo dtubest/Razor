@@ -5,5 +5,5 @@ package com.me.web.servlet;
  * Date: 12-12-10
  */
 public interface Handler {
-    public View process();
+    public Object handle();
 }

@@ -1,6 +1,6 @@
 package com.me.web.servlet;
 
-import com.me.web.servlet.router.DefaultRouter;
+import com.me.web.servlet.mapping.AnnotationHandlerMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,40 +29,34 @@ public class DispatcherFilter implements Filter {
     private static final String HEADER_LASTMOD = "Last-Modified";
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        Context.setServletContext(filterConfig.getServletContext());
+    public void init(FilterConfig config) throws ServletException {
+        Context.setServletContext(config.getServletContext());
+        // todo 注册所有的controller
+        ControllerManager.registerByPackage("test.controller");
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
+        // todo 映射策略
+        HandlerMapping mapping = getHandlerMapping();
+        // todo 执行策略
+        Dispatcher dispatcher = getDispatcher();
+        FrameworkRequest frameworkRequest
+                = new FrameworkRequest((HttpServletRequest) request, (HttpServletResponse) response);
+        dispatcher.service(frameworkRequest, mapping);
+    }
 
-        String requestURI = httpRequest.getRequestURI();
-        // todo 过滤掉静态资源的请求，直接交给容器处理
-        if (requestURI.toLowerCase().endsWith("jpg")) {
-            chain.doFilter(request, response);
-            return;
-        }
-//        maybeSetHttpCache(httpRequest, httpResponse);
-
-        // todo 这里其实是获取映射策略，router就是对策略的封装
-        Router router = getRouter();
-        Resource resource = router.route(httpRequest.getRequestURI());
-
-        if (null != resource)
-            sendResource(response, resource);
-        else
-            doFilter(request, response, chain);
+    private Dispatcher getDispatcher() {
+        return new DefaultDispatcher();
     }
 
     private void ignoreURI(String requestURI, FilterChain chain) {
 
     }
 
-    protected Router getRouter() {
-        return new DefaultRouter();
+    protected HandlerMapping getHandlerMapping() {
+        return new AnnotationHandlerMapping();
     }
 
     @Override
@@ -118,9 +112,4 @@ public class DispatcherFilter implements Filter {
             resp.setDateHeader(HEADER_LASTMOD, lastModified);
     }
 
-    private void sendResource(ServletResponse response, Resource resource)
-            throws IOException {
-        response.setContentType(resource.getContentType());
-        response.getOutputStream().write(resource.toBytes());
-    }
 }

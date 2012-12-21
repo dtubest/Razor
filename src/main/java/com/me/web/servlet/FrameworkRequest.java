@@ -34,4 +34,8 @@ public class FrameworkRequest {
     public HttpServletResponse getResponse() {
         return response;
     }
+
+    public static FrameworkRequest wrap(HttpServletRequest request, HttpServletResponse response) {
+        return new FrameworkRequest(request, response);
+    }
 }

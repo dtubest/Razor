@@ -38,15 +38,13 @@ public class DispatcherFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        // todo 映射策略
+
         HandlerMapping mapping = getHandlerMapping();
-        // todo 执行策略
         Dispatcher dispatcher = getDispatcher();
 
-        // todo 视图解析策略
         ViewResolver resolver = getViewResolver();
         FrameworkRequest frameworkRequest
-                = new FrameworkRequest((HttpServletRequest) request, (HttpServletResponse) response);
+                = FrameworkRequest.wrap((HttpServletRequest) request, (HttpServletResponse) response);
         dispatcher.service(frameworkRequest, mapping, resolver);
     }
 
@@ -58,10 +56,6 @@ public class DispatcherFilter implements Filter {
         return new DefaultDispatcher();
     }
 
-    private void ignoreURI(String requestURI, FilterChain chain) {
-
-    }
-
     protected HandlerMapping getHandlerMapping() {
         return new AnnotationHandlerMapping();
     }
@@ -69,6 +63,13 @@ public class DispatcherFilter implements Filter {
     @Override
     public void destroy() {
     }
+
+
+    /////////////////////////////////////////////////////////////////
+
+    /**
+     * 下面是暂时还没有用到的方法
+     */
 
     private void maybeSetHttpCache(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         String method = httpRequest.getMethod();

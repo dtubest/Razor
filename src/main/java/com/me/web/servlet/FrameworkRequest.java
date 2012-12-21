@@ -26,4 +26,12 @@ public class FrameworkRequest {
     public void setTargetUri(String uri) {
         targetUri = uri;
     }
+
+    public HttpServletRequest getRequest() {
+        return request;
+    }
+
+    public HttpServletResponse getResponse() {
+        return response;
+    }
 }

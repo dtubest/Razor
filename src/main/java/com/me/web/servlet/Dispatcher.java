@@ -5,5 +5,5 @@ package com.me.web.servlet;
  * Date: 12-12-10
  */
 public interface Dispatcher {
-    public void service(FrameworkRequest request, HandlerMapping mapping);
+    public void service(FrameworkRequest request, HandlerMapping mapping, ViewResolver resolver);
 }

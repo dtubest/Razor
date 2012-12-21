@@ -42,9 +42,16 @@ public class DispatcherFilter implements Filter {
         HandlerMapping mapping = getHandlerMapping();
         // todo 执行策略
         Dispatcher dispatcher = getDispatcher();
+
+        // todo 视图解析策略
+        ViewResolver resolver = getViewResolver();
         FrameworkRequest frameworkRequest
                 = new FrameworkRequest((HttpServletRequest) request, (HttpServletResponse) response);
-        dispatcher.service(frameworkRequest, mapping);
+        dispatcher.service(frameworkRequest, mapping, resolver);
+    }
+
+    private ViewResolver getViewResolver() {
+        return new JspViewResolver();
     }
 
     private Dispatcher getDispatcher() {

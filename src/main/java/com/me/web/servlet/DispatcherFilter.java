@@ -36,7 +36,9 @@ public class DispatcherFilter implements Filter {
     private HandlerMapping handlerMapping;
     private Dispatcher dispatcher;
     private ViewResolver viewResolver;
+    private RequestEscape[] escapes = new RequestEscape[] {};
 
+    private Context context = new Context();
 
     @Override
     public void init(FilterConfig config) throws ServletException {
@@ -52,12 +54,15 @@ public class DispatcherFilter implements Filter {
         String res = "/WEB-INF/" + config.getFilterName() + "-config.json";
         InputStream stream = WebResources.getResourceAsStream(res);
         JSONObject jsonConfig;
-        try {
-            String text = StringUtils.readAsString(stream);
-            jsonConfig = JSON.parseObject(text);
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (null != stream) {
+            try {
+                String text = StringUtils.readAsString(stream);
+                jsonConfig = JSON.parseObject(text);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
 
@@ -65,7 +70,7 @@ public class DispatcherFilter implements Filter {
         handlerMapping = getHandlerMapping();
         dispatcher = getDispatcher();
         viewResolver = getViewResolver();
-        Context.setServletContext(config.getServletContext());
+        context.setServletContext(config.getServletContext());
         // todo （如何）注册所有的controller，如何带来开发的高效性
         ControllerManager.registerByPackage("test.controller");
     }
@@ -73,26 +78,16 @@ public class DispatcherFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-
-        // todo 文件的上传应该如何实现？使用第三方库？自己实现好像不大现实
-
-        // todo 缓存该如何实现对http友好？
-
-        // todo 各种组件应该怎么注册，怎么绑定？毕竟filter可以有多个实例
-
-        // todo action应该如何定义？后缀加.action或者不加，应该怎么处理
-
-        // todo 关于某些路径需要过滤的情况，应该如何做呢？通过配置过滤掉一批请求（可选），如果没有过滤，并且没有找到合适的处理器，就应该chain.doFilter
-        // todo 这个可以考虑引入requestEscape的概念
-
-        // todo 还有一大块：参数绑定没做呢。
-
-        // todo mapping这个概念应该有么？应该
-
-        // todo dispatcher这个概念应该有么？。。。
+        String uri = ((HttpServletRequest) request).getRequestURI();
+        for (RequestEscape escape : escapes) {
+            if (escape.escape(uri)) {
+                chain.doFilter(request, response);
+                return;
+            }
+        }
 
         FrameworkRequest frameworkRequest
-                = FrameworkRequest.wrap((HttpServletRequest) request, (HttpServletResponse) response);
+                = FrameworkRequest.wrap((HttpServletRequest) request, (HttpServletResponse) response, context);
 
         // todo 修改了初始化的策略，但是也引入了另外一个问题，那就是在多线程下面，dispatcher会如何表现呢？
         dispatcher.service(frameworkRequest, handlerMapping, viewResolver);

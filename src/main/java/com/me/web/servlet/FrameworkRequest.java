@@ -12,6 +12,8 @@ public class FrameworkRequest {
     private HttpServletResponse response;
     private String targetUri;
 
+    private Context context;
+
     public FrameworkRequest(HttpServletRequest request, HttpServletResponse response) {
         this.request = request;
         this.response = response;
@@ -35,7 +37,13 @@ public class FrameworkRequest {
         return response;
     }
 
-    public static FrameworkRequest wrap(HttpServletRequest request, HttpServletResponse response) {
-        return new FrameworkRequest(request, response);
+    public Context getFrameworkContext() {
+        return context;
+    }
+
+    public static FrameworkRequest wrap(HttpServletRequest request, HttpServletResponse response, Context context) {
+        FrameworkRequest frameworkRequest = new FrameworkRequest(request, response);
+        frameworkRequest.context = context;
+        return frameworkRequest;
     }
 }

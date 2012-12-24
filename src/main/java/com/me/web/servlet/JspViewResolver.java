@@ -13,7 +13,8 @@ public class JspViewResolver implements ViewResolver {
         String viewPath = "";
 
         try {
-            Context.getServletContext().getRequestDispatcher("/WEB-INF/test.jsp")
+            request.getFrameworkContext().getServletContext()
+                    .getRequestDispatcher("/WEB-INF/test.jsp")
                     .forward(request.getRequest(), request.getResponse());
         } catch (ServletException e) {
             e.printStackTrace();

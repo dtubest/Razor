@@ -24,7 +24,7 @@ public class DefaultDispatcher implements Dispatcher {
         } else if (String.class.isAssignableFrom(result.getClass())) {
             resolver.render(request, (String) result);
 
-        } else if(JsonResult.class.isAssignableFrom(result.getClass())) {
+        } else if (JsonResult.class.isAssignableFrom(result.getClass())) {
             try {
                 request.getResponse().getWriter().write(((JsonResult) result).toJson());
             } catch (IOException e) {

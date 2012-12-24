@@ -24,7 +24,11 @@
             <artifactId>logback-classic</artifactId>
             <version>1.0.7</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.1.26</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>mvc_with_test</finalName>

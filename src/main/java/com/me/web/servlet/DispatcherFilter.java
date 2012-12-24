@@ -1,5 +1,7 @@
 package com.me.web.servlet;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.me.web.servlet.mapping.AnnotationHandlerMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +10,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * User: t.ding
@@ -37,6 +40,27 @@ public class DispatcherFilter implements Filter {
 
     @Override
     public void init(FilterConfig config) throws ServletException {
+
+        /**
+         * 资源解析器的初始化
+         */
+        WebResources.init(config.getServletContext());
+
+        /**
+         * 读取配置文件
+         */
+        String res = "/WEB-INF/" + config.getFilterName() + "-config.json";
+        InputStream stream = WebResources.getResourceAsStream(res);
+        JSONObject jsonConfig;
+        try {
+            String text = StringUtils.readAsString(stream);
+            jsonConfig = JSON.parseObject(text);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         frameworkConfig = config;
         handlerMapping = getHandlerMapping();
         dispatcher = getDispatcher();

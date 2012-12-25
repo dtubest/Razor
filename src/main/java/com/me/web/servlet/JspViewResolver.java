@@ -9,6 +9,10 @@ import java.io.IOException;
  */
 public class JspViewResolver implements ViewResolver {
     @Override
+    public void setViewPath(String path) {
+    }
+
+    @Override
     public void render(FrameworkRequest request, String view) {
         String viewPath = "";
 

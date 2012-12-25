@@ -10,6 +10,15 @@ import java.io.InputStreamReader;
  * Date: 12-12-24
  */
 public class StringUtils {
+
+    public static boolean isEmpty(String str) {
+        return null == str || str.isEmpty();
+    }
+
+    public static boolean isNotEmpty(String str) {
+        return !isEmpty(str);
+    }
+
     public static String readAsString(InputStream in) throws IOException {
         if (null == in) return null;
 

@@ -1,6 +1,7 @@
 package com.me.web.servlet;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.me.web.servlet.mapping.AnnotationHandlerMapping;
 import org.slf4j.Logger;
@@ -31,30 +32,70 @@ public class DispatcherFilter implements Filter {
 
     private static final String HEADER_LASTMOD = "Last-Modified";
 
+    private static final String config_file = "config-file";
+
 
     private FilterConfig frameworkConfig;
     private HandlerMapping handlerMapping;
     private Dispatcher dispatcher;
     private ViewResolver viewResolver;
-    private RequestEscape[] escapes = new RequestEscape[] {};
+    private RequestEscape[] escapes = new RequestEscape[]{};
+
+    private String basePackage;
 
     private Context context = new Context();
 
     @Override
     public void init(FilterConfig config) throws ServletException {
-
         /**
          * 资源解析器的初始化
          */
         WebResources.init(config.getServletContext());
 
-        /**
-         * 读取配置文件
-         */
-        String res = "/WEB-INF/" + config.getFilterName() + "-config.json";
-        InputStream stream = WebResources.getResourceAsStream(res);
-        JSONObject jsonConfig;
+        frameworkConfig = config;
+        context.setServletContext(config.getServletContext());
 
+        initStrategies(config);
+        registerControllers(config);
+    }
+
+    private void registerControllers(FilterConfig config) {
+        basePackage = config.getInitParameter("controller-package");
+        if (StringUtils.isEmpty(basePackage)) {
+            throw new FrameworkInitException();
+        }
+        ControllerManager.registerByPackage(basePackage);
+    }
+
+    private JSONObject jsonConfig;
+
+    private void initStrategies(FilterConfig config) {
+        /**
+         * 读取配置文件:先判断是否指定了自定义的配置文件，否则检查默认文件，如果两者都没有，使用默认配置
+         */
+        readConfigFile(config);
+
+        try {
+            initHandlerMappings();
+            initDispatcher();
+            initViewResolvers();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void readConfigFile(FilterConfig config) {
+        String res;
+        if (StringUtils.isNotEmpty(config.getInitParameter(config_file))) {
+            res = config.getInitParameter(config_file);
+        } else
+            res = "/WEB-INF/" + config.getFilterName() + "-config.json";
+
+        InputStream stream = WebResources.getResourceAsStream(res);
         if (null != stream) {
             try {
                 String text = StringUtils.readAsString(stream);
@@ -64,15 +105,26 @@ public class DispatcherFilter implements Filter {
                 e.printStackTrace();
             }
         }
+    }
 
+    private void initHandlerMappings() {
+        handlerMapping = new AnnotationHandlerMapping();
+    }
 
-        frameworkConfig = config;
-        handlerMapping = getHandlerMapping();
-        dispatcher = getDispatcher();
-        viewResolver = getViewResolver();
-        context.setServletContext(config.getServletContext());
-        // todo （如何）注册所有的controller，如何带来开发的高效性
-        ControllerManager.registerByPackage("test.controller");
+    private void initDispatcher() {
+        dispatcher = new DefaultDispatcher();
+    }
+
+    private void initViewResolvers() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        JSONArray resolver = jsonConfig.getJSONArray("viewResolver");
+        JSONObject r = null;
+        if (null != resolver) {
+            r = resolver.getJSONObject(0);
+        }
+
+        Object o = Class.forName(r.getString("class")).newInstance();
+        viewResolver = (ViewResolver) o;
+        viewResolver.setViewPath(r.getJSONObject("init-params").getString("view-path"));
     }
 
     @Override
@@ -91,18 +143,6 @@ public class DispatcherFilter implements Filter {
 
         // todo 修改了初始化的策略，但是也引入了另外一个问题，那就是在多线程下面，dispatcher会如何表现呢？
         dispatcher.service(frameworkRequest, handlerMapping, viewResolver);
-    }
-
-    private ViewResolver getViewResolver() {
-        return new JspViewResolver();
-    }
-
-    private Dispatcher getDispatcher() {
-        return new DefaultDispatcher();
-    }
-
-    protected HandlerMapping getHandlerMapping() {
-        return new AnnotationHandlerMapping();
     }
 
     @Override

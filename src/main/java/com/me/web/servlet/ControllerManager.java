@@ -58,6 +58,7 @@ public class ControllerManager {
     }
 
     private static String getServiceName(RequestMapping methodAnnotation) {
+        if (null == methodAnnotation) return null;
         String value = methodAnnotation.value();
         if (null == value) value = "/";
         else if (!value.startsWith("/")) value = "/" + value;
@@ -100,6 +101,7 @@ public class ControllerManager {
             Method[] methods = clazz.getMethods();
             for (Method method : methods) {
                 String serviceName = getServiceName(method.getAnnotation(RequestMapping.class));
+                if(null == serviceName) continue;
                 if (request.getRequestUri().equals(nameSpace + serviceName)) {
                     mtd = method;
                     break;

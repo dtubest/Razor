@@ -12,6 +12,8 @@ import java.net.URL;
 public class WebResources {
     private static final ClassLoader loader = WebResources.class.getClassLoader();
     private static ServletContext context;
+    private static boolean initialized;
+
 
     public static InputStream getResourceAsStream(String res) {
         InputStream result;
@@ -35,6 +37,9 @@ public class WebResources {
     }
 
     static void init(ServletContext context) {
+        if (initialized) return;
         WebResources.context = context;
+
+        initialized = true;
     }
 }

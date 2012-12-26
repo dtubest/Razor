@@ -1,6 +1,6 @@
 //package com.me.web.servlet.view;
 //
-//import com.me.web.servlet.Context;
+//import com.me.web.servlet.WebContext;
 //import com.me.web.servlet.Resource;
 //import com.me.web.servlet.View;
 //
@@ -28,8 +28,8 @@
 //    @Override
 //    public Resource toResource() {
 //
-//        ServletContext context = Context.getServletContext();
-//        InputStream in = context.getResourceAsStream(view);
+//        ServletContext context = WebContext.getServletContext();
+//        InputStream in = context.getWebResourceAsStream(view);
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 //        final StringBuilder buffer = new StringBuilder();
 //

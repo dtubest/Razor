@@ -12,51 +12,60 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: t.ding
  * Date: 12-11-23
  */
 public class DispatcherFilter implements Filter {
+    public static final String WEB_MVC_CONTEXT_ATTRIBUTE = "com.me.web.servlet.DispatcherFilter.web_mvc_context_attribute";
+
+    private static final String USER_CONFIG_FILE_ATTR_NAME = "config-file";
     private static final Logger logger = LoggerFactory.getLogger(DispatcherFilter.class);
 
-    private static final String METHOD_DELETE = "DELETE";
-    private static final String METHOD_HEAD = "HEAD";
-    private static final String METHOD_GET = "GET";
-    private static final String METHOD_OPTIONS = "OPTIONS";
-    private static final String METHOD_POST = "POST";
-    private static final String METHOD_PUT = "PUT";
-
-    private static final String METHOD_TRACE = "TRACE";
-    private static final String HEADER_IFMODSINCE = "If-Modified-Since";
-
-    private static final String HEADER_LASTMOD = "Last-Modified";
-
-    private static final String config_file = "config-file";
-
-
-    private FilterConfig frameworkConfig;
     private HandlerMapping handlerMapping;
     private Dispatcher dispatcher;
     private ViewResolver viewResolver;
-    private RequestEscape[] escapes = new RequestEscape[]{};
+
+    private RequestEscape[] escapes;
 
     private String basePackage;
 
-    private Context context = new Context();
+    private WebContext webContext;
+
+    private Map<String, String> params;
 
     @Override
-    public void init(FilterConfig config) throws ServletException {
+    public void init(FilterConfig config) {
         /**
-         * 资源解析器的初始化
+         * 以下各个初始化步骤不能颠倒
          */
-        WebResources.init(config.getServletContext());
-
-        frameworkConfig = config;
-        context.setServletContext(config.getServletContext());
-
-        initStrategies(config);
+        readFrameworkDispatcherInitParams(config);
+        initFrameworkWebContext(config);
+        initFrameworkStrategies(config);
         registerControllers(config);
+    }
+
+    private static final String DISPATCHER_FILTER_NAME = "dispatcher_filter_name";
+
+    private void readFrameworkDispatcherInitParams(FilterConfig config) {
+        params = new HashMap<String, String>();
+
+        Enumeration names = config.getInitParameterNames();
+        while (names.hasMoreElements()) {
+            String name = (String) names.nextElement();
+            params.put(name, config.getInitParameter(name));
+        }
+
+        params.put(DISPATCHER_FILTER_NAME, config.getFilterName());
+    }
+
+    private void initFrameworkWebContext(FilterConfig config) {
+        webContext = new WebContext(config.getServletContext());
+        WebResources.init(webContext);
     }
 
     private void registerControllers(FilterConfig config) {
@@ -69,13 +78,11 @@ public class DispatcherFilter implements Filter {
 
     private JSONObject jsonConfig;
 
-    private void initStrategies(FilterConfig config) {
-        /**
-         * 读取配置文件:先判断是否指定了自定义的配置文件，否则检查默认文件，如果两者都没有，使用默认配置
-         */
-        readConfigFile(config);
+    private void initFrameworkStrategies(FilterConfig config) {
+        readConfigFile();
 
         try {
+            initRequestEscapes();
             initHandlerMappings();
             initDispatcher();
             initViewResolvers();
@@ -88,15 +95,20 @@ public class DispatcherFilter implements Filter {
         }
     }
 
-    private void readConfigFile(FilterConfig config) {
-        String res;
-        if (StringUtils.isNotEmpty(config.getInitParameter(config_file))) {
-            res = config.getInitParameter(config_file);
-        } else
-            res = "/WEB-INF/" + config.getFilterName() + "-config.json";
+    private void initRequestEscapes() {
+        escapes = new RequestEscape[]{};
+    }
 
-        InputStream stream = WebResources.getResourceAsStream(res);
-        if (null != stream) {
+    private void readConfigFile() {
+        String file;
+        if (StringUtils.isNotEmpty(params.get(USER_CONFIG_FILE_ATTR_NAME)))
+            file = params.get(USER_CONFIG_FILE_ATTR_NAME);
+        else
+            file = "/WEB-INF/" + params.get(DISPATCHER_FILTER_NAME) + "-config.json";
+
+        InputStream stream = WebResources.getResourceAsStream(file);
+
+        if (null != stream)
             try {
                 String text = StringUtils.readAsString(stream);
                 jsonConfig = JSON.parseObject(text);
@@ -104,7 +116,6 @@ public class DispatcherFilter implements Filter {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
     }
 
     private void initHandlerMappings() {
@@ -130,6 +141,8 @@ public class DispatcherFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+        request.setAttribute(WEB_MVC_CONTEXT_ATTRIBUTE, webContext);
+
         String uri = ((HttpServletRequest) request).getRequestURI();
         for (RequestEscape escape : escapes) {
             if (escape.escape(uri)) {
@@ -139,7 +152,7 @@ public class DispatcherFilter implements Filter {
         }
 
         FrameworkRequest frameworkRequest
-                = FrameworkRequest.wrap((HttpServletRequest) request, (HttpServletResponse) response, context);
+                = FrameworkRequest.wrap((HttpServletRequest) request, (HttpServletResponse) response, webContext);
 
         // todo 修改了初始化的策略，但是也引入了另外一个问题，那就是在多线程下面，dispatcher会如何表现呢？
         dispatcher.service(frameworkRequest, handlerMapping, viewResolver);
@@ -148,61 +161,4 @@ public class DispatcherFilter implements Filter {
     @Override
     public void destroy() {
     }
-
-
-    /////////////////////////////////////////////////////////////////
-
-    /**
-     * 下面是暂时还没有用到的方法
-     */
-
-    private void maybeSetHttpCache(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-        String method = httpRequest.getMethod();
-
-        if (method.equals(METHOD_GET)) {
-            long lastModified = getLastModified();
-            if (lastModified == -1) {
-                // servlet doesn't support if-modified-since, no reason
-                // to go through further expensive logic
-            } else {
-                long ifModifiedSince = httpRequest.getDateHeader(HEADER_IFMODSINCE);
-                if (ifModifiedSince < (lastModified / 1000 * 1000)) {
-                    // If the servlet mod time is later, call doGet()
-                    // Round down to the nearest second for a proper compare
-                    // A ifModifiedSince of -1 will always be less
-                    maybeSetLastModified(httpResponse, lastModified);
-                } else {
-                    httpResponse.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-                }
-            }
-
-        } else if (method.equals(METHOD_HEAD)) {
-            long lastModified = getLastModified();
-            maybeSetLastModified(httpResponse, lastModified);
-
-        } else if (method.equals(METHOD_POST)) {
-
-        } else if (method.equals(METHOD_PUT)) {
-
-        } else if (method.equals(METHOD_DELETE)) {
-
-        } else if (method.equals(METHOD_OPTIONS)) {
-
-        } else if (method.equals(METHOD_TRACE)) {
-
-        }
-    }
-
-    private long getLastModified() {
-        return -1;
-    }
-
-    private void maybeSetLastModified(HttpServletResponse resp,
-                                      long lastModified) {
-        if (resp.containsHeader(HEADER_LASTMOD))
-            return;
-        if (lastModified >= 0)
-            resp.setDateHeader(HEADER_LASTMOD, lastModified);
-    }
-
 }

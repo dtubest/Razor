@@ -26,7 +26,7 @@ public class ControllerManager {
 
         URL res;
         File file;
-        if (null == (res = WebResources.getResource(basePackage.replace(".", "/")))
+        if (null == (res = WebResources.getResourceAsURL(basePackage.replace(".", "/")))
                 || !(file = new File(res.getPath())).isDirectory())
             throw new ControllerPackageNotFoundException();
 

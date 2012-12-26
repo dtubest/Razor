@@ -12,7 +12,7 @@ public class FrameworkRequest {
     private HttpServletResponse response;
     private String targetUri;
 
-    private Context context;
+    private WebContext context;
 
     public FrameworkRequest(HttpServletRequest request, HttpServletResponse response) {
         this.request = request;
@@ -37,11 +37,11 @@ public class FrameworkRequest {
         return response;
     }
 
-    public Context getFrameworkContext() {
+    public WebContext getFrameworkContext() {
         return context;
     }
 
-    public static FrameworkRequest wrap(HttpServletRequest request, HttpServletResponse response, Context context) {
+    public static FrameworkRequest wrap(HttpServletRequest request, HttpServletResponse response, WebContext context) {
         FrameworkRequest frameworkRequest = new FrameworkRequest(request, response);
         frameworkRequest.context = context;
         return frameworkRequest;

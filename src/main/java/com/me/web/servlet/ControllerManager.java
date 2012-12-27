@@ -12,17 +12,20 @@ import java.util.Map;
  * User: t.ding
  * Date: 12-12-12
  */
+
+// todo 这个类也不能够以静态的形式来使用，应该以实例的形式来使用
+
 public class ControllerManager {
-    static List<String> controllers = new ArrayList<String>();
-    static Map<String, String> mappings = new HashMap<String, String>();
+    private List<String> controllers = new ArrayList<String>();
+    private Map<String, String> mappings = new HashMap<String, String>();
 
-    private static String basePackage;
+    private String basePackage;
 
-    public static void registerByPackage(String basePackage) {
+    public void registerByPackage(String basePackage) {
         controllers.clear();
         mappings.clear();
 
-        ControllerManager.basePackage = basePackage;
+        this.basePackage = basePackage;
 
         URL res;
         File file;
@@ -33,7 +36,7 @@ public class ControllerManager {
         registerByPath0(file);
     }
 
-    private static void registerClassFile0(String name) {
+    private void registerClassFile0(String name) {
         if (name.endsWith(".class")) {
             String fullName = basePackage + "." + name.substring(0, name.indexOf("."));
             controllers.add(fullName);
@@ -57,7 +60,7 @@ public class ControllerManager {
         }
     }
 
-    private static String getServiceName(RequestMapping methodAnnotation) {
+    private String getServiceName(RequestMapping methodAnnotation) {
         if (null == methodAnnotation) return null;
         String value = methodAnnotation.value();
         if (null == value) value = "/";
@@ -65,14 +68,14 @@ public class ControllerManager {
         return value;
     }
 
-    private static String getNameSpace(RequestMapping clazzAnnotation) {
+    private String getNameSpace(RequestMapping clazzAnnotation) {
         String value = clazzAnnotation.value();
         if (null == value) value = "";
         else if (!value.startsWith("/")) value = "/" + value;
         return value;
     }
 
-    private static void registerByPath0(File file) {
+    private void registerByPath0(File file) {
         File[] files = file.listFiles();
         if (null == files) return;
         for (File aFile : files) {
@@ -84,11 +87,11 @@ public class ControllerManager {
         }
     }
 
-    public static List<String> getControllers() {
+    public List<String> getControllers() {
         return controllers;
     }
 
-    public static HandlerMethod getService(final FrameworkRequest request) {
+    public HandlerMethod getService(final FrameworkRequest request) {
         String clazzName = mappings.get(request.getRequestUri());
         if (null == clazzName) return null;
         Class<?> clazz = null;
@@ -101,7 +104,7 @@ public class ControllerManager {
             Method[] methods = clazz.getMethods();
             for (Method method : methods) {
                 String serviceName = getServiceName(method.getAnnotation(RequestMapping.class));
-                if(null == serviceName) continue;
+                if (null == serviceName) continue;
                 if (request.getRequestUri().equals(nameSpace + serviceName)) {
                     mtd = method;
                     break;

@@ -11,6 +11,11 @@ public class DefaultDispatcher implements Dispatcher {
     public void service(FrameworkRequest request, HandlerMapping mapping, ViewResolver resolver) {
         // todo 执行，得到结果
         Handler handler = mapping.getHandler(request);
+
+        if (null == handler) {
+            new DefaultHandler(request).handle();
+            return;
+        }
         Object result = handler.handle();
 
         while (Forward.class.isAssignableFrom(result.getClass())) {

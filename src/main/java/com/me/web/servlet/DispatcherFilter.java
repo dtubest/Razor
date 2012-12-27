@@ -23,30 +23,29 @@ import java.util.Map;
 public class DispatcherFilter implements Filter {
     public static final String WEB_MVC_CONTEXT_ATTRIBUTE = "com.me.web.servlet.DispatcherFilter.web_mvc_context_attribute";
 
-    private static final String USER_CONFIG_FILE_ATTR_NAME = "config-file";
+    private static final String INIT_PARAM_NAME_USER_CONFIG_FILE = "config-file";
+    private static final String INIT_PARAM_NAME_CONTROLLER_PACKAGE = "controller-package";
+
     private static final Logger logger = LoggerFactory.getLogger(DispatcherFilter.class);
 
     private HandlerMapping handlerMapping;
     private Dispatcher dispatcher;
     private ViewResolver viewResolver;
-
     private RequestEscape[] escapes;
-
-    private String basePackage;
+    private Map<String, String> params;
 
     private WebContext webContext;
-
-    private Map<String, String> params;
+    private ControllerManager controllerManager;
 
     @Override
     public void init(FilterConfig config) {
         /**
-         * 以下各个初始化步骤不能颠倒
+         * The following initialization steps can not be reversed
          */
         readFrameworkDispatcherInitParams(config);
         initFrameworkWebContext(config);
-        initFrameworkStrategies(config);
-        registerControllers(config);
+        initFrameworkStrategies();
+        registerControllers();
     }
 
     private static final String DISPATCHER_FILTER_NAME = "dispatcher_filter_name";
@@ -64,21 +63,21 @@ public class DispatcherFilter implements Filter {
     }
 
     private void initFrameworkWebContext(FilterConfig config) {
-        webContext = new WebContext(config.getServletContext());
+        controllerManager = new ControllerManager();
+        webContext = new WebContext(config.getServletContext(), controllerManager);
         WebResources.init(webContext);
     }
 
-    private void registerControllers(FilterConfig config) {
-        basePackage = config.getInitParameter("controller-package");
-        if (StringUtils.isEmpty(basePackage)) {
+    private void registerControllers() {
+        if (StringUtils.isEmpty(params.get(INIT_PARAM_NAME_CONTROLLER_PACKAGE))) {
             throw new FrameworkInitException();
         }
-        ControllerManager.registerByPackage(basePackage);
+        controllerManager.registerByPackage(params.get(INIT_PARAM_NAME_CONTROLLER_PACKAGE));
     }
 
     private JSONObject jsonConfig;
 
-    private void initFrameworkStrategies(FilterConfig config) {
+    private void initFrameworkStrategies() {
         readConfigFile();
 
         try {
@@ -101,8 +100,8 @@ public class DispatcherFilter implements Filter {
 
     private void readConfigFile() {
         String file;
-        if (StringUtils.isNotEmpty(params.get(USER_CONFIG_FILE_ATTR_NAME)))
-            file = params.get(USER_CONFIG_FILE_ATTR_NAME);
+        if (StringUtils.isNotEmpty(params.get(INIT_PARAM_NAME_USER_CONFIG_FILE)))
+            file = params.get(INIT_PARAM_NAME_USER_CONFIG_FILE);
         else
             file = "/WEB-INF/" + params.get(DISPATCHER_FILTER_NAME) + "-config.json";
 
@@ -152,7 +151,7 @@ public class DispatcherFilter implements Filter {
         }
 
         FrameworkRequest frameworkRequest
-                = FrameworkRequest.wrap((HttpServletRequest) request, (HttpServletResponse) response, webContext);
+                = FrameworkRequest.wrap((HttpServletRequest) request, (HttpServletResponse) response, chain, webContext);
 
         // todo 修改了初始化的策略，但是也引入了另外一个问题，那就是在多线程下面，dispatcher会如何表现呢？
         dispatcher.service(frameworkRequest, handlerMapping, viewResolver);

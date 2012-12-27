@@ -10,14 +10,20 @@ import java.net.URL;
  * Date: 12-12-8
  */
 public class WebContext {
-    public WebContext(ServletContext context) {
+    public WebContext(ServletContext context, ControllerManager controllerManager) {
         this.context = context;
+        this.controllerManager = controllerManager;
     }
 
     private ServletContext context;
+    private ControllerManager controllerManager;
 
     public ServletContext getServletContext() {
         return context;
+    }
+
+    public ControllerManager getControllerManager() {
+        return controllerManager;
     }
 
     public InputStream getWebResourceAsStream(String res) {

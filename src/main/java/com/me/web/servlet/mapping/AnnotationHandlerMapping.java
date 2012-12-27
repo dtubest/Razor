@@ -15,6 +15,9 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     @Override
     public Handler getHandler(FrameworkRequest request, String uri) {
         request.setTargetUri(uri);
-        return new AnnotationMethodHandlerAdapter(ControllerManager.getService(request));
+        HandlerMethod handlerMethod = request.getFrameworkContext().getControllerManager().getService(request);
+        if (null == handlerMethod) return null;
+
+        return new AnnotationMethodHandlerAdapter(handlerMethod);
     }
 }

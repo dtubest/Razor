@@ -18,15 +18,15 @@ public class DefaultDispatcher implements Dispatcher {
         }
         Object result = handler.handle();
 
-        while (Forward.class.isAssignableFrom(result.getClass())) {
+        while (null != result && Forward.class.isAssignableFrom(result.getClass())) {
             handler = mapping.getHandler(request, ((Forward) result).getRedirectUri());
             result = handler.handle();
         }
 
         // todo 处理结果
-        if (void.class.isAssignableFrom(result.getClass())) {
+        if (null == result) return;
 
-        } else if (String.class.isAssignableFrom(result.getClass())) {
+        if (String.class.isAssignableFrom(result.getClass())) {
             resolver.render(request, (String) result);
 
         } else if (JsonResult.class.isAssignableFrom(result.getClass())) {
@@ -35,7 +35,10 @@ public class DefaultDispatcher implements Dispatcher {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
         } else if (Forward.class.isAssignableFrom(result.getClass())) {
+
+        } else if (Redirect.class.isAssignableFrom(result.getClass())) {
 
         }
     }

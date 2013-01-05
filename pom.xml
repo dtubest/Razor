@@ -29,6 +29,11 @@
             <artifactId>fastjson</artifactId>
             <version>1.1.26</version>
         </dependency>
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.17.1-GA</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>mvc_with_test</finalName>

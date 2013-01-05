@@ -18,6 +18,6 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         HandlerMethod handlerMethod = request.getFrameworkContext().getControllerManager().getService(request);
         if (null == handlerMethod) return null;
 
-        return new AnnotationMethodHandlerAdapter(handlerMethod);
+        return new AnnotationMethodHandlerAdapter(handlerMethod, request);
     }
 }

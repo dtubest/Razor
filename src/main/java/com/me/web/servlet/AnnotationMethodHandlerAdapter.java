@@ -1,12 +1,11 @@
 package com.me.web.servlet;
 
+import com.me.web.servlet.binder.IntegerBinder;
+import com.me.web.servlet.binder.StringBinder;
 import javassist.*;
-import javassist.bytecode.CodeAttribute;
 import javassist.bytecode.LocalVariableAttribute;
-import javassist.bytecode.MethodInfo;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  * User: t.ding
@@ -65,15 +64,22 @@ public class AnnotationMethodHandlerAdapter implements Handler {
         for (int i = 0; i < params.length; i++) {
             String name = attr.variableName(i + pos);
             String typeName = parameterTypes[i].getName();
-            if (typeName.equals("java.lang.String")) {
-                params[i] = request.getRequest().getParameter(name);
-            } else if(typeName.equals("java.lang.Integer")) {
-                params[i] = Integer.valueOf(request.getRequest().getParameter(name));
-            }
+
+            Binder binder = getBinder(typeName);
+            Object param = binder.get("paraname", request);
+            params[i] = param;
         }
 
         return params;
     }
 
+    private Binder getBinder(String typeName) {
+        if (typeName.equals("java.lang.String")) {
+            return new StringBinder();
+        } else if (typeName.equals("java.lang.Integer")) {
+            return new IntegerBinder();
+        }
 
+        return null;
+    }
 }

@@ -3,26 +3,38 @@ package com.me.web.servlet;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * User: t.ding
  * Date: 12-12-12
  */
-
-// todo 这个类也不能够以静态的形式来使用，应该以实例的形式来使用
-
 public class ControllerManager {
-    private List<String> controllers = new ArrayList<String>();
-    private Map<String, String> mappings = new HashMap<String, String>();
+    private static class Mapping {
+        private final Class<?> clazz;
+        private final Method method;
+        private final String uri;
+
+        public Mapping(Class<?> clazz, Method method, String uri) {
+            this.clazz = clazz;
+            this.method = method;
+            this.uri = uri;
+        }
+
+        public boolean match(String uri) {
+            // todo 这里需要提供判断这个action时候接受这个uri的逻辑
+            return false;
+        }
+    }
+
+    private static final char url_path_separator_char = '/';
+    private static final String url_path_separator = "/";
+
+    private Set<Mapping> mappings = new HashSet<Mapping>();
 
     private String basePackage;
 
     public void registerByPackage(String basePackage) {
-        controllers.clear();
         mappings.clear();
 
         this.basePackage = basePackage;
@@ -36,23 +48,43 @@ public class ControllerManager {
         registerByPath0(file);
     }
 
-    private void registerClassFile0(String name) {
+    public HandlerMethod getService(final FrameworkRequest request) {
+        for (Mapping mapping : mappings) {
+            String uri = request.getRequest().getRequestURI();
+            if (mapping.match(uri))
+                return new HandlerMethod(mapping.clazz, mapping.method);
+        }
+
+        return null;
+    }
+
+    /////////////////////////////////////////////
+
+    private void registerClassFile1(String name) {
         if (name.endsWith(".class")) {
             String fullName = basePackage + "." + name.substring(0, name.indexOf("."));
-            controllers.add(fullName);
 
             try {
                 Class<?> clazz = Class.forName(fullName);
-                RequestMapping clazzAnnotation = clazz.getAnnotation(RequestMapping.class);
-                String nameSpace = getNameSpace(clazzAnnotation);
+                if (null != clazz.getAnnotation(Exclude.class)) return;
 
-                Method[] methods = clazz.getMethods();
-                for (Method method : methods) {
-                    RequestMapping methodAnnotation = method.getAnnotation(RequestMapping.class);
-                    if (null == methodAnnotation) continue;
+                String nameSpace = getPath(clazz.getAnnotation(Path.class), clazz.getSimpleName());
 
-                    String serviceName = getServiceName(methodAnnotation);
-                    mappings.put(nameSpace + serviceName, fullName);
+                ArrayList<Method> list = new ArrayList<Method>();
+                Collections.addAll(list, clazz.getDeclaredMethods());
+
+                Class<?> superClazz = clazz;
+
+                while ((superClazz = superClazz.getSuperclass()) != Object.class && null != superClazz) {
+                    Collections.addAll(list, superClazz.getDeclaredMethods());
+                }
+
+                for (Method method : list) {
+                    if (null != method.getAnnotation(Exclude.class)) continue;
+
+                    String serviceName = getPath(method.getAnnotation(Path.class), method.getName());
+
+                    mappings.add(new Mapping(clazz, method, nameSpace + serviceName));
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -60,19 +92,26 @@ public class ControllerManager {
         }
     }
 
-    private String getServiceName(RequestMapping methodAnnotation) {
-        if (null == methodAnnotation) return null;
-        String value = methodAnnotation.value();
-        if (null == value) value = "/";
-        else if (!value.startsWith("/")) value = "/" + value;
-        return value;
+    private String getPath(Path path, String dName) {
+        if (null == path || path.value() == null || StringUtils.containsBlank(path.value()))
+            return getPath0(dName);
+
+        return getPath0(path.value());
     }
 
-    private String getNameSpace(RequestMapping clazzAnnotation) {
-        String value = clazzAnnotation.value();
-        if (null == value) value = "";
-        else if (!value.startsWith("/")) value = "/" + value;
-        return value;
+    private String getPath0(String dName) {
+        StringBuilder value = new StringBuilder(url_path_separator);
+        char[] chars = dName.toCharArray();
+        for (char aChar : chars)
+            if (url_path_separator_char != aChar)
+                value.append(aChar);
+            else if (value.charAt(value.length() - 1) != url_path_separator_char)
+                value.append(aChar);
+
+        if (value.charAt(value.length() - 1) == url_path_separator_char)
+            value.deleteCharAt(value.length() - 1);
+
+        return value.toString();
     }
 
     private void registerByPath0(File file) {
@@ -80,42 +119,10 @@ public class ControllerManager {
         if (null == files) return;
         for (File aFile : files) {
             if (aFile.isFile()) {
-                registerClassFile0(aFile.getName());
+                registerClassFile1(aFile.getName());
                 continue;
             }
             registerByPath0(aFile);
         }
-    }
-
-    public List<String> getControllers() {
-        return controllers;
-    }
-
-    public HandlerMethod getService(final FrameworkRequest request) {
-        String clazzName = mappings.get(request.getRequestUri());
-        if (null == clazzName) return null;
-        Class<?> clazz = null;
-        Method mtd = null;
-        try {
-            clazz = Class.forName(clazzName);
-            if (null == clazz) return null;
-
-            String nameSpace = getNameSpace(clazz.getAnnotation(RequestMapping.class));
-            Method[] methods = clazz.getMethods();
-            for (Method method : methods) {
-                String serviceName = getServiceName(method.getAnnotation(RequestMapping.class));
-                if (null == serviceName) continue;
-                if (request.getRequestUri().equals(nameSpace + serviceName)) {
-                    mtd = method;
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        if (null == mtd) return null;
-
-        return new HandlerMethod(clazz, mtd);
     }
 }

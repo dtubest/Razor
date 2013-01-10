@@ -10,6 +10,14 @@ import java.io.InputStreamReader;
  * Date: 12-12-24
  */
 public class StringUtils {
+    public static boolean containsBlank(String str) {
+        char[] chars = str.toCharArray();
+        for (char aChar : chars)
+            if (aChar < 33)
+                return true;
+
+        return false;
+    }
 
     public static boolean isEmpty(String str) {
         return null == str || str.isEmpty();

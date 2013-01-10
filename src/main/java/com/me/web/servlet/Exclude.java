@@ -7,11 +7,9 @@ import java.lang.annotation.Target;
 
 /**
  * User: t.ding
- * Date: 12-11-24
+ * Date: 13-1-10
  */
-
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target({ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE, ElementType.PACKAGE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RequestMapping {
-    public String value() default "/";
+public @interface Exclude {
 }

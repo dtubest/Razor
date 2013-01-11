@@ -1,29 +1,58 @@
 package com.me.web.servlet;
 
+import com.me.util.StringUtils;
+import com.me.web.servlet.annotation.Exclude;
+import com.me.web.servlet.annotation.Path;
+import com.me.web.servlet.exception.ControllerPackageNotFoundException;
+
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * User: t.ding
  * Date: 12-12-12
  */
 public class ControllerManager {
-    private static class Mapping {
-        private final Class<?> clazz;
-        private final Method method;
-        private final String uri;
+    public static class Mapping {
+        public final Class<?> clazz;
+        public final Method method;
+        public final String uri;
+
+        private final Pattern pattern;
 
         public Mapping(Class<?> clazz, Method method, String uri) {
             this.clazz = clazz;
             this.method = method;
             this.uri = uri;
+            pattern = getPattern(uri);
         }
 
         public boolean match(String uri) {
-            // todo 这里需要提供判断这个action时候接受这个uri的逻辑
-            return false;
+            return pattern.matcher(uri).matches();
+        }
+
+        public int getPathParamIndex(String name) {
+            Pattern pattern = Pattern.compile("\\{" + name + "(:\\S+)?\\}");
+            String[] strings = uri.split("/");
+
+            for (int i = 1; i < strings.length; i++) {
+                if (pattern.matcher(strings[i]).matches())
+                    return i - 1;
+            }
+            return -1;
+        }
+
+        ////////////////////////////////////////////////////
+
+        private Pattern getPattern(String uri) {
+            String innerUri = "^" + uri + "$";
+            return Pattern.compile(innerUri.replaceAll("\\{[a-zA-Z]+(:\\S+)?\\}", "[\\\\S]+"));
         }
     }
 
@@ -52,10 +81,14 @@ public class ControllerManager {
         for (Mapping mapping : mappings) {
             String uri = request.getRequest().getRequestURI();
             if (mapping.match(uri))
-                return new HandlerMethod(mapping.clazz, mapping.method);
+                return new HandlerMethod(mapping);
         }
 
         return null;
+    }
+
+    public Set<Mapping> getMappings() {
+        return mappings;
     }
 
     /////////////////////////////////////////////

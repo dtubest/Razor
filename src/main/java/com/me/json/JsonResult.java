@@ -1,4 +1,4 @@
-package com.me.web.servlet;
+package com.me.json;
 
 /**
  * User: t.ding

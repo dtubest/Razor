@@ -1,7 +1,7 @@
 package com.me.web.servlet;
 
-import com.me.web.servlet.binder.IntegerBinder;
-import com.me.web.servlet.binder.StringBinder;
+import com.me.web.servlet.binding.IntegerBinder;
+import com.me.web.servlet.binding.StringBinder;
 import javassist.*;
 import javassist.bytecode.LocalVariableAttribute;
 
@@ -66,7 +66,7 @@ public class AnnotationMethodHandlerAdapter implements Handler {
             String typeName = parameterTypes[i].getName();
 
             Binder binder = getBinder(typeName);
-            Object param = binder.get("paraname", request);
+            Object param = binder.get(name, request);
             params[i] = param;
         }
 
@@ -75,9 +75,9 @@ public class AnnotationMethodHandlerAdapter implements Handler {
 
     private Binder getBinder(String typeName) {
         if (typeName.equals("java.lang.String")) {
-            return new StringBinder();
+            return new StringBinder(handler);
         } else if (typeName.equals("java.lang.Integer")) {
-            return new IntegerBinder();
+            return new IntegerBinder(handler);
         }
 
         return null;

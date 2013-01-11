@@ -1,4 +1,4 @@
-package com.me.web.servlet;
+package com.me.web.servlet.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -9,7 +9,8 @@ import java.lang.annotation.Target;
  * User: t.ding
  * Date: 13-1-10
  */
-@Target({ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE, ElementType.PACKAGE})
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Exclude {
+public @interface Path {
+    public String value();
 }

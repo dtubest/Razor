@@ -1,4 +1,4 @@
-package com.me.web.servlet;
+package com.me.web.servlet.exception;
 
 /**
  * User: t.ding

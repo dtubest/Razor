@@ -1,4 +1,4 @@
-package com.me.web.servlet.binder;
+package com.me.web.servlet.binding;
 
 /**
  * User: t.ding

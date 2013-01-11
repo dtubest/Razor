@@ -9,10 +9,12 @@ import java.lang.reflect.Method;
 public class HandlerMethod {
     private Class clazz;
     private Method method;
+    private ControllerManager.Mapping mapping;
 
-    public HandlerMethod(Class clazz, Method method) {
-        this.clazz = clazz;
-        this.method = method;
+    public HandlerMethod(ControllerManager.Mapping mapping) {
+        this.clazz = mapping.clazz;
+        this.method = mapping.method;
+        this.mapping = mapping;
     }
 
     public Class getClazz() {
@@ -29,5 +31,9 @@ public class HandlerMethod {
 
     public void setMethod(Method method) {
         this.method = method;
+    }
+
+    public ControllerManager.Mapping getMapping() {
+        return mapping;
     }
 }

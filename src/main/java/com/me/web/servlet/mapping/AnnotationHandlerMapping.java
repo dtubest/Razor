@@ -1,6 +1,10 @@
 package com.me.web.servlet.mapping;
 
-import com.me.web.servlet.*;
+import com.me.web.servlet.FrameworkRequest;
+import com.me.web.servlet.Handler;
+import com.me.web.servlet.HandlerMapping;
+import com.me.web.servlet.HandlerMethod;
+import com.me.web.servlet.handler.AnnotationMethodHandlerAdapter;
 
 /**
  * User: t.ding

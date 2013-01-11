@@ -1,6 +1,5 @@
 package com.me.web.servlet.binding;
 
-import com.me.web.servlet.Binder;
 import com.me.web.servlet.HandlerMethod;
 
 /**
@@ -10,7 +9,7 @@ import com.me.web.servlet.HandlerMethod;
 public class FloatBinder extends Binder<Float> {
     private final HandlerMethod handler;
 
-    public FloatBinder(HandlerMethod handler) {
+    FloatBinder(HandlerMethod handler) {
         this.handler = handler;
     }
 

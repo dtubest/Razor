@@ -38,7 +38,7 @@ public class ControllerManager {
         }
 
         public int getPathParamIndex(String name) {
-            Pattern pattern = Pattern.compile("\\{" + name + "(:\\S+)?\\}");
+            Pattern pattern = Pattern.compile("\\{" + name + "\\}");
             String[] strings = uri.split("/");
 
             for (int i = 1; i < strings.length; i++) {
@@ -52,7 +52,7 @@ public class ControllerManager {
 
         private Pattern getPattern(String uri) {
             String innerUri = "^" + uri + "$";
-            return Pattern.compile(innerUri.replaceAll("\\{[a-zA-Z]+(:\\S+)?\\}", "[\\\\S]+"));
+            return Pattern.compile(innerUri.replaceAll("\\{[a-zA-Z]+\\}", "[\\\\S]+"));
         }
     }
 

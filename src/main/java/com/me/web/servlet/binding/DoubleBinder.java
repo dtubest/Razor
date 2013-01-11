@@ -1,6 +1,5 @@
 package com.me.web.servlet.binding;
 
-import com.me.web.servlet.Binder;
 import com.me.web.servlet.HandlerMethod;
 
 /**
@@ -8,7 +7,7 @@ import com.me.web.servlet.HandlerMethod;
  * Date: 13-1-6
  */
 public class DoubleBinder extends Binder<Double> {
-    private final HandlerMethod handler;
+    final HandlerMethod handler;
 
     public DoubleBinder(HandlerMethod handler) {
         this.handler = handler;

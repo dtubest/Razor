@@ -2,23 +2,45 @@ package com.me.web.servlet.binding;
 
 import com.me.util.StringUtils;
 import com.me.web.servlet.FrameworkRequest;
-import com.me.web.servlet.HandlerMethod;
+import com.me.web.servlet.Http;
+import com.me.web.servlet.Mapping;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: t.ding
  * Date: 13-1-6
  */
 public abstract class Binder<T> {
-    public T get(String paramName, FrameworkRequest request) {
-        return get(paramName, request, null);
+    public static final StringBinder stringBinder = new StringBinder();
+    public static final IntegerBinder integerBinder = new IntegerBinder();
+    public static final LongBinder longBinder = new LongBinder();
+    public static final FloatBinder floatBinder = new FloatBinder();
+    public static final DoubleBinder doubleBinder = new DoubleBinder();
+    public static final BooleanBinder booleanBinder = new BooleanBinder();
+
+    private static Map<Class, Binder> binderMap = new HashMap<Class, Binder>();
+
+    static {
+        binderMap.put(String.class, stringBinder);
+        binderMap.put(Integer.class, integerBinder);
+        binderMap.put(Long.class, longBinder);
+        binderMap.put(Float.class, floatBinder);
+        binderMap.put(Double.class, doubleBinder);
+        binderMap.put(Boolean.class, booleanBinder);
     }
 
-    public T get(String paramName, FrameworkRequest request, T defaultValue) {
+    public T get(String paramName, FrameworkRequest request, Mapping mapping) {
+        return get(paramName, request, mapping, null);
+    }
+
+    public T get(String paramName, FrameworkRequest request, Mapping mapping, T defaultValue) {
         String parameter;
-        int i = getHandler().getMapping().getPathParamIndex(paramName);
+        int i = mapping.getPathParamIndex(paramName);
 
         if (-1 != i)
-            parameter = request.getRequest().getRequestURI().split("/")[i + 1];
+            parameter = request.getRequest().getRequestURI().split(Http.uri_separator)[i + 1];
         else
             parameter = request.getRequest().getParameter(paramName);
 
@@ -30,25 +52,18 @@ public abstract class Binder<T> {
 
     ////////////////////////////////////////
 
-    public static Binder<?> createBinder(String typeName, HandlerMethod handler) {
-        if (typeName.equals("java.lang.String")) {
-            return new StringBinder(handler);
-        } else if (typeName.equals("java.lang.Integer")) {
-            return new IntegerBinder(handler);
-        } else if (typeName.equals("java.lang.Long")) {
-            return new LongBinder(handler);
-        } else if (typeName.equals("java.lang.Float")) {
-            return new FloatBinder(handler);
-        } else if (typeName.equals("java.lang.Double")) {
-            return new DoubleBinder(handler);
-        } else if (typeName.equals("java.lang.Boolean")) {
-            return new BooleanBinder(handler);
+    public static Binder<?> binderOf(String typeName) {
+        Binder binder;
+        try {
+            binder = binderMap.get(Class.forName(typeName));
+        } catch (ClassNotFoundException e) {
+            binder = null;
         }
+        if (null != binderMap)
+            return binder;
 
         return new InvalidTypeBinder();
     }
 
     protected abstract T cast(String strValue);
-
-    protected abstract HandlerMethod getHandler();
 }

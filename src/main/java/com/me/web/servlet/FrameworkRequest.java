@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
  * User: t.ding
  * Date: 12-12-20
  */
+// todo 感觉这是一个设计的很蹩脚的类
 public class FrameworkRequest {
     private HttpServletRequest request;
     private HttpServletResponse response;

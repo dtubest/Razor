@@ -1,8 +1,8 @@
-package com.me.web.servlet.handler;
+package com.me.web.servlet.handling;
 
 import com.me.web.servlet.FrameworkRequest;
 import com.me.web.servlet.Handler;
-import com.me.web.servlet.HandlerMethod;
+import com.me.web.servlet.Mapping;
 import com.me.web.servlet.binding.Binder;
 import javassist.*;
 import javassist.bytecode.LocalVariableAttribute;
@@ -16,16 +16,14 @@ public abstract class ParamExtractableHandlerAdapter implements Handler {
         Object[] params;
 
         ClassPool pool = ClassPool.getDefault();
-        // todo 这里可能有一个潜在的bug，因为以后达成jar后，this.getClass()和用户的controller的path应该会不同，目前简单起见，先写成这个样子
-        pool.insertClassPath(new ClassClassPath(this.getClass()));
 
-        HandlerMethod handler = getHandler();
+        Mapping mapping = getMapping();
+        pool.insertClassPath(new ClassClassPath(mapping.clazz));
 
-        CtClass cc = pool.get(handler.getClazz().getName());
-        CtMethod cm = cc.getDeclaredMethod(handler.getMethod().getName());
+        CtMethod cm = pool.get(mapping.clazz.getName()).getDeclaredMethod(mapping.method.getName());
         CtClass[] parameterTypes = cm.getParameterTypes();
 
-        if (0 == parameterTypes.length) return null;
+        if (0 == parameterTypes.length) return new Object[0];
 
         params = new Object[parameterTypes.length];
 
@@ -36,15 +34,15 @@ public abstract class ParamExtractableHandlerAdapter implements Handler {
             String name = attr.variableName(i + pos);
             String typeName = parameterTypes[i].getName();
 
-            Binder binder = Binder.createBinder(typeName, handler);
-            Object param = binder.get(name, getRequest());
+            Binder binder = Binder.binderOf(typeName);
+            Object param = binder.get(name, getRequest(), mapping);
             params[i] = param;
         }
 
         return params;
     }
 
-    protected abstract HandlerMethod getHandler();
+    protected abstract Mapping getMapping();
 
     protected abstract FrameworkRequest getRequest();
 }

@@ -1,7 +1,8 @@
-package com.me.web.servlet.handler;
+package com.me.web.servlet.handling;
 
 import com.me.web.servlet.FrameworkRequest;
 import com.me.web.servlet.Handler;
+import com.me.web.servlet.Result;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
@@ -10,17 +11,15 @@ import java.io.IOException;
  * User: t.ding
  * Date: 12-12-27
  */
-public class DefaultHandler implements Handler {
-
+public class DefaultUrlHandlerAdapter implements Handler {
     private FrameworkRequest request;
 
-    public DefaultHandler(FrameworkRequest request) {
+    public DefaultUrlHandlerAdapter(FrameworkRequest request) {
         this.request = request;
     }
 
     @Override
-    public Object handle() {
-
+    public Result handle() {
         try {
             request.getChain().doFilter(request.getRequest(), request.getResponse());
         } catch (IOException e) {

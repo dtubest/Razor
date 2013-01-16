@@ -1,7 +1,7 @@
 package com.me.web.servlet.binding;
 
 import com.me.web.servlet.FrameworkRequest;
-import com.me.web.servlet.HandlerMethod;
+import com.me.web.servlet.Mapping;
 
 /**
  * User: t.ding
@@ -10,21 +10,6 @@ import com.me.web.servlet.HandlerMethod;
 public class InvalidTypeBinder extends Binder<Object> {
     @Override
     protected Object cast(String strValue) {
-        return null;
-    }
-
-    @Override
-    protected HandlerMethod getHandler() {
-        return null;
-    }
-
-    @Override
-    public Object get(String paramName, FrameworkRequest request) {
-        return null;
-    }
-
-    @Override
-    public Object get(String paramName, FrameworkRequest request, Object defaultValue) {
         return null;
     }
 }

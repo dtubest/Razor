@@ -1,7 +1,7 @@
-package com.me.web.servlet.handler;
+package com.me.web.servlet.handling;
 
 import com.me.web.servlet.FrameworkRequest;
-import com.me.web.servlet.HandlerMethod;
+import com.me.web.servlet.Mapping;
 import javassist.NotFoundException;
 
 import java.lang.reflect.InvocationTargetException;
@@ -11,11 +11,11 @@ import java.lang.reflect.InvocationTargetException;
  * Date: 12-12-21
  */
 public class AnnotationMethodHandlerAdapter extends ParamExtractableHandlerAdapter {
-    private HandlerMethod handler;
+    private Mapping mapping;
     private FrameworkRequest request;
 
-    public AnnotationMethodHandlerAdapter(HandlerMethod handler, FrameworkRequest request) {
-        this.handler = handler;
+    public AnnotationMethodHandlerAdapter(Mapping mapping, FrameworkRequest request) {
+        this.mapping = mapping;
         this.request = request;
     }
 
@@ -25,9 +25,9 @@ public class AnnotationMethodHandlerAdapter extends ParamExtractableHandlerAdapt
         try {
             Object[] params = extractParams();
             if (null == params)
-                invoke = handler.getMethod().invoke(handler.getClazz().newInstance());
+                invoke = mapping.method.invoke(mapping.clazz.newInstance());
             else
-                invoke = handler.getMethod().invoke(handler.getClazz().newInstance(), params);
+                invoke = mapping.method.invoke(mapping.clazz.newInstance(), params);
 
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -43,8 +43,8 @@ public class AnnotationMethodHandlerAdapter extends ParamExtractableHandlerAdapt
     }
 
     @Override
-    protected HandlerMethod getHandler() {
-        return handler;
+    protected Mapping getMapping() {
+        return mapping;
     }
 
     @Override

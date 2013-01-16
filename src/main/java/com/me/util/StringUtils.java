@@ -27,6 +27,14 @@ public class StringUtils {
         return !isEmpty(str);
     }
 
+    public static boolean isBlank(String str) {
+        return isEmpty(str.trim());
+    }
+
+    public static boolean isNotBlank(String str) {
+        return !isBlank(str);
+    }
+
     public static String readAsString(InputStream in) throws IOException {
         if (null == in) return null;
 

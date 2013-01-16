@@ -74,7 +74,7 @@ public class DispatcherFilter implements Filter {
         if (StringUtils.isEmpty(params.get(INIT_PARAM_NAME_CONTROLLER_PACKAGE))) {
             throw new FrameworkInitException();
         }
-        controllerManager.registerByPackage(params.get(INIT_PARAM_NAME_CONTROLLER_PACKAGE));
+        controllerManager.regControllersByPackage(params.get(INIT_PARAM_NAME_CONTROLLER_PACKAGE));
     }
 
     private JSONObject jsonConfig;

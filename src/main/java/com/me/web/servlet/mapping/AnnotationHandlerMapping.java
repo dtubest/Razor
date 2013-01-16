@@ -1,10 +1,7 @@
 package com.me.web.servlet.mapping;
 
-import com.me.web.servlet.FrameworkRequest;
-import com.me.web.servlet.Handler;
-import com.me.web.servlet.HandlerMapping;
-import com.me.web.servlet.HandlerMethod;
-import com.me.web.servlet.handler.AnnotationMethodHandlerAdapter;
+import com.me.web.servlet.*;
+import com.me.web.servlet.handling.AnnotationMethodHandlerAdapter;
 
 /**
  * User: t.ding
@@ -19,9 +16,9 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     @Override
     public Handler getHandler(FrameworkRequest request, String uri) {
         request.setTargetUri(uri);
-        HandlerMethod handlerMethod = request.getFrameworkContext().getControllerManager().getService(request);
-        if (null == handlerMethod) return null;
+        Mapping mapping = request.getFrameworkContext().getControllerManager().getService(request);
+        if (null == mapping) return null;
 
-        return new AnnotationMethodHandlerAdapter(handlerMethod, request);
+        return new AnnotationMethodHandlerAdapter(mapping, request);
     }
 }

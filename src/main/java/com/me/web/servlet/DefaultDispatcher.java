@@ -1,7 +1,7 @@
 package com.me.web.servlet;
 
 import com.me.json.JsonResult;
-import com.me.web.servlet.handler.DefaultHandler;
+import com.me.web.servlet.handling.DefaultUrlHandlerAdapter;
 
 import java.io.IOException;
 
@@ -16,7 +16,7 @@ public class DefaultDispatcher implements Dispatcher {
         Handler handler = mapping.getHandler(request);
 
         if (null == handler) {
-            new DefaultHandler(request).handle();
+            new DefaultUrlHandlerAdapter(request).handle();
             return;
         }
         Object result = handler.handle();

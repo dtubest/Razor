@@ -1,48 +1,69 @@
 package com.me.web.servlet;
 
-import com.me.json.JsonResult;
-import com.me.web.servlet.handling.DefaultUrlHandlerAdapter;
+import com.me.web.servlet.binding.Binder;
+import javassist.*;
+import javassist.bytecode.LocalVariableAttribute;
 
-import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * User: t.ding
  * Date: 12-12-12
  */
 public class DefaultDispatcher implements Dispatcher {
+
     @Override
-    public void service(FrameworkRequest request, HandlerMapping mapping, ViewResolver resolver) {
-        // todo 执行，得到结果
-        Handler handler = mapping.getHandler(request);
+    public Result service(Mapping mapping, FrameworkRequest request) {
+        Object[] params = extractParams(mapping, request);
 
-        if (null == handler) {
-            new DefaultUrlHandlerAdapter(request).handle();
-            return;
+        Result result = null;
+        try {
+            if (null == params)
+                result = (Result) mapping.method.invoke(mapping.clazz.newInstance());
+            else
+                result = (Result) mapping.method.invoke(mapping.clazz.newInstance(), params);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("cannot access controller class " + mapping.clazz.getName(), e);
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            throw new RuntimeException("controller class " + mapping.clazz.getName() + " dosen't has a default controller", e);
         }
-        Object result = handler.handle();
+        return result;
+    }
 
-        while (null != result && Forward.class.isAssignableFrom(result.getClass())) {
-            handler = mapping.getHandler(request, ((Forward) result).getRedirectUri());
-            result = handler.handle();
+    private Object[] extractParams(Mapping mapping, FrameworkRequest request) {
+        Object[] params;
+
+        ClassPool pool = ClassPool.getDefault();
+
+        pool.insertClassPath(new ClassClassPath(mapping.clazz));
+
+        CtMethod cm = null;
+        CtClass[] parameterTypes = new CtClass[0];
+        try {
+            cm = pool.get(mapping.clazz.getName()).getDeclaredMethod(mapping.method.getName());
+            parameterTypes = cm.getParameterTypes();
+        } catch (NotFoundException e) {
+            e.printStackTrace();
         }
 
-        // todo 处理结果
-        if (null == result) return;
+        if (0 == parameterTypes.length) return new Object[0];
 
-        if (String.class.isAssignableFrom(result.getClass())) {
-            resolver.render(request, (String) result);
+        params = new Object[parameterTypes.length];
 
-        } else if (JsonResult.class.isAssignableFrom(result.getClass())) {
-            try {
-                request.getResponse().getWriter().write(((JsonResult) result).toJson());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        LocalVariableAttribute attr = (LocalVariableAttribute)
+                cm.getMethodInfo().getCodeAttribute().getAttribute(LocalVariableAttribute.tag);
+        int pos = Modifier.isStatic(cm.getModifiers()) ? 0 : 1;
+        for (int i = 0; i < params.length; i++) {
+            String name = attr.variableName(i + pos);
+            String typeName = parameterTypes[i].getName();
 
-        } else if (Forward.class.isAssignableFrom(result.getClass())) {
-
-        } else if (Redirect.class.isAssignableFrom(result.getClass())) {
-
+            Binder binder = Binder.binderOf(typeName);
+            Object param = binder.get(name, request, mapping);
+            params[i] = param;
         }
+
+        return params;
     }
 }

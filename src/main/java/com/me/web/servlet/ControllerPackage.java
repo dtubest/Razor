@@ -13,7 +13,7 @@ public class ControllerPackage {
     private List<String> packages = new ArrayList<String>();
 
     public void addPackage(String pacName) {
-        ClassUtils.validatePacName(pacName);
+        ClassUtils.validatePacOrClassName(pacName);
 
         packages.add(pacName);
     }

@@ -4,10 +4,7 @@ import com.me.util.ClassUtils;
 import com.me.web.servlet.annotation.Exclude;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * User: t.ding
@@ -28,15 +25,15 @@ public class ControllerManager {
         }
     }
 
-    // todo 这个方法需要测试
-    public Mapping getService(final FrameworkRequest request) {
+    public Mapping[] matches(final String uri) {
+        List<Mapping> result = new ArrayList<Mapping>();
+
         for (Mapping mapping : mappings) {
-            String uri = request.getRequest().getRequestURI();
             if (mapping.match(uri))
-                return mapping;
+                result.add(mapping);
         }
 
-        return null;
+        return result.toArray(new Mapping[result.size()]);
     }
 
     public Set<Mapping> getMappings() {

@@ -56,7 +56,7 @@ public class DispatcherFilter implements Filter {
         }
         log.info("controller packages {}", packages);
 
-        dispatcher = new DefaultDispatcher();
+        dispatcher = new Dispatcher();
     }
 
     @Override
@@ -64,19 +64,16 @@ public class DispatcherFilter implements Filter {
             throws IOException, ServletException {
         request.setAttribute(WEB_CONTEXT_ATTRIBUTE, webContext);
 
-        FrameworkRequest frameworkRequest
-                = FrameworkRequest.wrap((HttpServletRequest) request, (HttpServletResponse) response, chain, webContext);
+        Mapping[] mappings = controllerManager.matches(((HttpServletRequest) request).getRequestURI());
 
-        Mapping mapping = controllerManager.getService(frameworkRequest);
-        if (null == mapping) {
+        if (mappings.length != 1) {
             chain.doFilter(request, response);
-            return;
+        } else {
+            Result result = dispatcher.service(mappings[0], (HttpServletRequest) request);
+
+            ((HttpServletResponse) response).setStatus(200);
+            // todo 解析result
         }
-
-        Result result = dispatcher.service(mapping, frameworkRequest);
-
-        ((HttpServletResponse) response).setStatus(200);
-        // todo 解析result
     }
 
     @Override

@@ -1,11 +1,9 @@
 package com.me.web.servlet;
 
-import com.me.web.servlet.annotation.Path;
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
-import java.util.regex.Pattern;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 /**
  * User: t.ding
@@ -14,19 +12,19 @@ import static org.junit.Assert.*;
 public class PathTest {
     @Test
     public void test() {
-        assertTrue(Http.pathPattern.matcher("control").matches());
-        assertTrue(Http.pathPattern.matcher("/control").matches());
-        assertTrue(Http.pathPattern.matcher("control/").matches());
-        assertTrue(Http.pathPattern.matcher("/control/").matches());
-        assertTrue(Http.pathPattern.matcher("/control/aaa").matches());
+        assertThat(Http.pathPattern.matcher("control").matches(), CoreMatchers.is(true));
+        assertThat(Http.pathPattern.matcher("/control").matches(), CoreMatchers.is(true));
+        assertThat(Http.pathPattern.matcher("control/").matches(), CoreMatchers.is(true));
+        assertThat(Http.pathPattern.matcher("/control/").matches(), CoreMatchers.is(true));
+        assertThat(Http.pathPattern.matcher("/control/aaa").matches(), CoreMatchers.is(true));
 
-        assertFalse(Http.pathPattern.matcher("/control/?fdsafd").matches());
-        assertFalse(Http.pathPattern.matcher("/control/fdsafd//").matches());
-        assertFalse(Http.pathPattern.matcher("/control/fds#afd/").matches());
-        assertFalse(Http.pathPattern.matcher("/control/fds&afd/").matches());
-        assertFalse(Http.pathPattern.matcher("/control/fds%afd/").matches());
-        assertFalse(Http.pathPattern.matcher("/control/fds\\afd/").matches());
-        assertFalse(Http.pathPattern.matcher("/control/fds+afd/").matches());
-        assertFalse(Http.pathPattern.matcher("/").matches());
+        assertThat(Http.pathPattern.matcher("/control/?fdsafd").matches(), CoreMatchers.is(false));
+        assertThat(Http.pathPattern.matcher("/control/fdsafd//").matches(), CoreMatchers.is(false));
+        assertThat(Http.pathPattern.matcher("/control/fds#afd/").matches(), CoreMatchers.is(false));
+        assertThat(Http.pathPattern.matcher("/control/fds&afd/").matches(), CoreMatchers.is(false));
+        assertThat(Http.pathPattern.matcher("/control/fds%afd/").matches(), CoreMatchers.is(false));
+        assertThat(Http.pathPattern.matcher("/control/fds\\afd/").matches(), CoreMatchers.is(false));
+        assertThat(Http.pathPattern.matcher("/control/fds+afd/").matches(), CoreMatchers.is(false));
+        assertThat(Http.pathPattern.matcher("/").matches(), CoreMatchers.is(false));
     }
 }

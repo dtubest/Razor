@@ -1,10 +1,10 @@
 package com.me.web.servlet.binding;
 
 import com.me.util.StringUtils;
-import com.me.web.servlet.FrameworkRequest;
 import com.me.web.servlet.Http;
 import com.me.web.servlet.Mapping;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,18 +31,18 @@ public abstract class Binder<T> {
         binderMap.put(Boolean.class, booleanBinder);
     }
 
-    public T get(String paramName, FrameworkRequest request, Mapping mapping) {
+    public T get(String paramName, HttpServletRequest request, Mapping mapping) {
         return get(paramName, request, mapping, null);
     }
 
-    public T get(String paramName, FrameworkRequest request, Mapping mapping, T defaultValue) {
+    public T get(String paramName, HttpServletRequest request, Mapping mapping, T defaultValue) {
         String parameter;
         int i = mapping.getPathParamIndex(paramName);
 
         if (-1 != i)
-            parameter = request.getRequest().getRequestURI().split(Http.uri_separator)[i + 1];
+            parameter = request.getRequestURI().split(Http.uri_separator)[i + 1];
         else
-            parameter = request.getRequest().getParameter(paramName);
+            parameter = request.getParameter(paramName);
 
         if (StringUtils.isEmpty(parameter))
             return defaultValue;

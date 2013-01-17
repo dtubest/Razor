@@ -1,36 +1,22 @@
 package com.me;
 
 import com.me.web.servlet.Config;
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
+import static org.junit.Assert.assertThat;
 
-import static org.junit.Assert.*;
 /**
  * User: t.ding
  * Date: 13-1-14
  */
 public class ConfigTest {
     @Test
-    public void testCase() {
+    public void testCase() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         String configClassName = "com.me.TestConfig";
+        Config config = (Config) Class.forName(configClassName).newInstance();
 
-        if (null == configClassName)
-            return;
-
-        Config config = null;
-        try {
-            config = (Config) Class.forName(configClassName).newInstance();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        assertNotNull(config);
+        assertThat(config, CoreMatchers.notNullValue());
     }
 
 }

@@ -50,8 +50,6 @@ public abstract class Binder<T> {
         return cast(parameter);
     }
 
-    ////////////////////////////////////////
-
     public static Binder<?> binderOf(String typeName) {
         Binder binder;
         try {

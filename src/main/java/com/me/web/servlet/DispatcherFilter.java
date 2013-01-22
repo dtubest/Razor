@@ -1,6 +1,7 @@
 package com.me.web.servlet;
 
 import com.me.util.ClassUtils;
+import com.me.web.servlet.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,17 +63,28 @@ public class DispatcherFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+        // todo 注意，这个WEB_CONTEXT_ATTRIBUTE目前尚未用到，有必要存在？
         request.setAttribute(WEB_CONTEXT_ATTRIBUTE, webContext);
 
         Mapping[] mappings = controllerManager.matches(((HttpServletRequest) request).getRequestURI());
 
         if (mappings.length != 1) {
-            chain.doFilter(request, response);
+            if (mappings.length < 1) {
+                chain.doFilter(request, response);
+                return;
+            }
+
+            throw new RuntimeException("more than one action match to uri "
+                    + ((HttpServletRequest) request).getRequestURI());
         } else {
             Result result = dispatcher.service(mappings[0], (HttpServletRequest) request);
+            // todo 是否需要wrap一下response？
 
-            ((HttpServletResponse) response).setStatus(200);
-            // todo 解析result
+            ((HttpServletResponse)response).setStatus(result.status());
+            response.setContentType(result.contentType());
+            response.getOutputStream().write(result.wrappedContent());
+
+
         }
     }
 

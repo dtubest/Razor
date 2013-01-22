@@ -1,4 +1,4 @@
-package com.me.web.servlet;
+package com.me.web.servlet.config;
 
 import com.me.util.ClassUtils;
 

@@ -1,7 +1,7 @@
 package com.me;
 
-import com.me.web.servlet.Config;
-import com.me.web.servlet.ControllerPackage;
+import com.me.web.servlet.config.Config;
+import com.me.web.servlet.config.ControllerPackage;
 
 /**
  * User: t.ding

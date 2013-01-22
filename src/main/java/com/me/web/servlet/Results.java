@@ -5,19 +5,17 @@ package com.me.web.servlet;
  * Date: 13-1-12
  */
 
-/**
- * 这个类里面不定义action
- */
-public class Results implements Result {
-    public static final Result OK = new Result() {
-        public int status() {
-            return 200;
-        }
-    };
+import com.me.web.servlet.result.NotFound;
+import com.me.web.servlet.result.Ok;
+import com.me.web.servlet.result.Todo;
 
-    public static final Result TODO = new Result() {
-        public int status() {
-            return 501;
-        }
-    };
+/**
+ * 这个类里面不定义action,只定义一系列的<code>Result</code>
+ */
+public final class Results {
+    public static final Result OK = new Ok();
+
+    public static final Result TODO = new Todo();
+
+    public static final Result NOT_FOUND = new NotFound();
 }

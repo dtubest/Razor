@@ -1,5 +1,6 @@
 package com.me.web.servlet;
 
+import com.me.web.servlet.config.ControllerPackage;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 

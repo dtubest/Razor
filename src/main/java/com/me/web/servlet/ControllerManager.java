@@ -53,7 +53,7 @@ public class ControllerManager {
 
         Class<?> superClazz = clazz;
         while ((superClazz = superClazz.getSuperclass()) != Object.class
-                && superClazz != Results.class && null != superClazz)
+                && superClazz != Action.class && null != superClazz)
             Collections.addAll(list, superClazz.getDeclaredMethods());
 
         for (Method method : list) {

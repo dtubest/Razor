@@ -160,10 +160,13 @@ public class ClassUtils {
         return result.toArray(new String[result.size()]);
     }
 
+    /**
+     * 验证一个包名或者类的全名时候合法（语法正确）
+     *
+     * @param name 包名或者类的全名
+     */
     public static void validatePacOrClassName(String name) {
         if (!pacNamePattern.matcher(name).matches())
             throw new RuntimeException(name + " is not a valid class or package name");
     }
-
-    /////////////////////////////////////////
 }

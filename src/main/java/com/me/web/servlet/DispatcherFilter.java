@@ -2,6 +2,10 @@ package com.me.web.servlet;
 
 import com.me.util.ClassUtils;
 import com.me.web.servlet.config.Config;
+import com.me.web.servlet.result.Ok;
+import com.me.web.servlet.result.Result;
+import com.me.web.servlet.result.View;
+import com.me.web.servlet.view.ViewEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +30,7 @@ public class DispatcherFilter implements Filter {
     // todo 这里有必要持有一个controllerManager的应用么？
     private WebContext webContext;
     private Dispatcher dispatcher;
+    private ViewEngine engine;
 
     @Override
     public void init(FilterConfig config) {
@@ -58,6 +63,9 @@ public class DispatcherFilter implements Filter {
         log.info("controller packages {}", packages);
 
         dispatcher = new Dispatcher();
+
+        engine = mvcConfigs.getViewEngine();
+
     }
 
     @Override
@@ -78,13 +86,18 @@ public class DispatcherFilter implements Filter {
                     + ((HttpServletRequest) request).getRequestURI());
         } else {
             Result result = dispatcher.service(mappings[0], (HttpServletRequest) request);
-            // todo 是否需要wrap一下response？
+            if (null == result)
+                result = new Ok();
 
-            ((HttpServletResponse)response).setStatus(result.status());
-            response.setContentType(result.contentType());
-            response.getOutputStream().write(result.wrappedContent());
+            if (result.type() == Result.Type.REDIRECT) {
+                ((HttpServletResponse) response).sendRedirect(result.content());
 
+            } else if (result.type() == Result.Type.DATA) {
+                response.getWriter().write(result.content());
 
+            } else {
+                engine.render((View) result, (HttpServletRequest) request, (HttpServletResponse) response);
+            }
         }
     }
 

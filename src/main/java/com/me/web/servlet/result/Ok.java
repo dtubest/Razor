@@ -1,24 +1,15 @@
 package com.me.web.servlet.result;
 
-import com.me.web.servlet.Result;
-
 /**
  * User: t.ding
  * Date: 13-1-22
  */
-public class Ok implements Result {
-    @Override
-    public int status() {
-        return 200;
+public class Ok extends Plain {
+    public Ok() {
+        this("");
     }
 
-    @Override
-    public String contentType() {
-        return null;
-    }
-
-    @Override
-    public byte[] wrappedContent() {
-        return new byte[0];
+    public Ok(String content) {
+        super(200, content, Type.DATA);
     }
 }

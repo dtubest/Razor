@@ -1,5 +1,6 @@
 package com.me;
 
+import com.me.web.servlet.view.ViewEngine;
 import com.me.web.servlet.config.Config;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
@@ -17,6 +18,15 @@ public class ConfigTest {
         Config config = (Config) Class.forName(configClassName).newInstance();
 
         assertThat(config, CoreMatchers.notNullValue());
+
+        config.executeConfigs();
+
+        assertThat(config.getControllerPackages()[0], CoreMatchers.equalTo("com.me"));
+        ViewEngine engine = config.getViewEngine();
+        assertThat(engine, CoreMatchers.notNullValue());
+
+        assertThat(engine.defaultSuffix(), CoreMatchers.equalTo("jsp"));
+
     }
 
 }

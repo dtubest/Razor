@@ -2,6 +2,7 @@ package com.me;
 
 import com.me.web.servlet.config.Config;
 import com.me.web.servlet.config.ControllerPackage;
+import com.me.web.servlet.config.Template;
 
 /**
  * User: t.ding
@@ -11,5 +12,10 @@ public class TestConfig extends Config {
     @Override
     public void setControllerPackage(ControllerPackage pac) {
         pac.addPackage("com.me");
+    }
+
+    @Override
+    protected void setViewTemplate(Template config) {
+
     }
 }

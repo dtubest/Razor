@@ -15,9 +15,4 @@ public class ClassUtilsTest {
     public void test() {
         assertThat(ClassUtils.loadClass("com.me.ConfigTest"), CoreMatchers.notNullValue());
     }
-
-    @Test
-    public void testGetSubPac() {
-        assertThat(ClassUtils.getSubPackage("com.me").length, CoreMatchers.is(2));
-    }
 }

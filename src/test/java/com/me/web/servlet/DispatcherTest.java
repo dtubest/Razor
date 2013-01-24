@@ -1,5 +1,6 @@
 package com.me.web.servlet;
 
+import com.me.web.servlet.result.Result;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.mockito.Mockito;

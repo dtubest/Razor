@@ -22,7 +22,7 @@ public class View extends Plain {
         return attributes.get(name);
     }
 
-    public Result attr(String name, Object value) {
+    public View attr(String name, Object value) {
         attributes.put(name, value);
         return this;
     }
@@ -35,7 +35,7 @@ public class View extends Plain {
         return mime;
     }
 
-    public Result mime(String mime) {
+    public View mime(String mime) {
         this.mime = mime;
         return this;
     }

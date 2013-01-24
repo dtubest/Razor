@@ -1,8 +1,10 @@
 package com.me.web.servlet.result;
+
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 import static org.junit.Assert.assertThat;
+
 /**
  * User: t.ding
  * Date: 13-1-24

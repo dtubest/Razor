@@ -1,7 +1,7 @@
 package com.me.web.servlet.config;
 
-import com.me.web.servlet.view.ViewEngine;
 import com.me.web.servlet.view.JspEngine;
+import com.me.web.servlet.view.ViewEngine;
 
 /**
  * User: t.ding
@@ -34,9 +34,9 @@ public class Config {
     }
 
     public final void executeConfigs() {
-        // todo 1. 包的设置
+        // 1. 包的设置
         setControllerPackage(pac);
-        // todo 2. 模板类型的设置
+        // 2. 模板类型的设置
         setViewTemplate0(template);
         // todo 3. ？
         // todo 4. ？

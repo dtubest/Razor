@@ -1,7 +1,7 @@
 package com.me;
 
-import com.me.web.servlet.view.ViewEngine;
 import com.me.web.servlet.config.Config;
+import com.me.web.servlet.view.ViewEngine;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 

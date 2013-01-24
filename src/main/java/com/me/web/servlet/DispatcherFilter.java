@@ -71,7 +71,6 @@ public class DispatcherFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        // todo 注意，这个WEB_CONTEXT_ATTRIBUTE目前尚未用到，有必要存在？
         request.setAttribute(WEB_CONTEXT_ATTRIBUTE, webContext);
 
         Mapping[] mappings = controllerManager.matches(((HttpServletRequest) request).getRequestURI());

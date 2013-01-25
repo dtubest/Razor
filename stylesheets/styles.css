@@ -685,6 +685,9 @@ header p {
   font-size: 18px;
   margin: 0px;
 }
+header a {
+    color: #f0f0f0;
+}
 
 #banner {
   z-index: 100;

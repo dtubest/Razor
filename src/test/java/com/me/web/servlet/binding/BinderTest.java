@@ -29,6 +29,6 @@ public class BinderTest {
         }
 
         binder = Binder.binderOf(Object.class.getName());
-        assertThat(binder, CoreMatchers.nullValue());
+        assertThat(binder, CoreMatchers.notNullValue());
     }
 }

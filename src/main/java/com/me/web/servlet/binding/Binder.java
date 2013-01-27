@@ -57,7 +57,7 @@ public abstract class Binder<T> {
         } catch (ClassNotFoundException e) {
             binder = null;
         }
-        if (null != binderMap)
+        if (null != binder)
             return binder;
 
         return new InvalidTypeBinder();

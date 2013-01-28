@@ -13,10 +13,12 @@ import java.net.URL;
  * User: t.ding
  * Date: 13-1-22
  */
-public class NotFound extends Plain {
+public class NotFound implements Result {
     private static final Logger log = LoggerFactory.getLogger(NotFound.class);
 
     private static final String template;
+
+    private String content;
 
     static {
         String str = "${message}";
@@ -36,8 +38,21 @@ public class NotFound extends Plain {
     }
 
     public NotFound(String content) {
-        status(404);
-        type(Type.DATA);
-        content(template.replace("${message}", content));
+        this.content = template.replace("${message}", content);
+    }
+
+    @Override
+    public int status() {
+        return 404;
+    }
+
+    @Override
+    public Type type() {
+        return Type.DATA;
+    }
+
+    @Override
+    public String content() {
+        return content;
     }
 }

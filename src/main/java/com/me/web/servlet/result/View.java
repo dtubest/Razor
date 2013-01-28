@@ -8,7 +8,7 @@ import java.util.Set;
  * User: t.ding
  * Date: 13-1-23
  */
-public class View extends Plain {
+public class View extends MutableResult {
     private String mime;
     private Map<String, Object> attributes;
 

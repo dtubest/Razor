@@ -4,8 +4,25 @@ package com.me.web.servlet.result;
  * User: t.ding
  * Date: 13-1-23
  */
-public class Redirect extends Plain {
+public class Redirect implements Result {
+    private String content;
+
     public Redirect(String content) {
-        super(302, content, Type.REDIRECT);
+        this.content = content;
+    }
+
+    @Override
+    public int status() {
+        return 302;
+    }
+
+    @Override
+    public Type type() {
+        return Type.REDIRECT;
+    }
+
+    @Override
+    public String content() {
+        return content;
     }
 }

@@ -92,6 +92,7 @@ public class DispatcherFilter implements Filter {
                 ((HttpServletResponse) response).sendRedirect(result.content());
 
             } else if (result.type() == Result.Type.DATA) {
+                ((HttpServletResponse) response).setStatus(result.status());
                 response.getWriter().write(result.content());
 
             } else {

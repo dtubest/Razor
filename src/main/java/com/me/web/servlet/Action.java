@@ -162,25 +162,25 @@ public class Action {
         return json;
     }
 
-    /**
-     * 构造一个状态码为status的结果
-     *
-     * @param status 状态码
-     * @return 结果
-     */
-    public Result status(int status) {
-        return status(status, "");
-    }
-
-    /**
-     * 构造一个状态码为status，内容为content的结果
-     *
-     * @param status 状态码
-     * @return 结果
-     */
-    public Result status(int status, String content) {
-        return new Plain(status, content, DATA);
-    }
+//    /**
+//     * 构造一个状态码为status的结果
+//     *
+//     * @param status 状态码
+//     * @return 结果
+//     */
+//    public Result status(int status) {
+//        return status(status, "");
+//    }
+//
+//    /**
+//     * 构造一个状态码为status，内容为content的结果
+//     *
+//     * @param status 状态码
+//     * @return 结果
+//     */
+//    public Result status(int status, String content) {
+//        return new MutableResult(status, content, DATA);
+//    }
 
     /**
      * 构造一个Redirect对象

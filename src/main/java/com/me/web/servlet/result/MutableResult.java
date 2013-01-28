@@ -4,15 +4,15 @@ package com.me.web.servlet.result;
  * User: t.ding
  * Date: 13-1-23
  */
-public class Plain implements Result {
+class MutableResult implements Result {
     private int status;
     private String content;
     private Type type;
 
-    public Plain() {
+    public MutableResult() {
     }
 
-    public Plain(int status, String content, Type type) {
+    public MutableResult(int status, String content, Type type) {
         this.status = status;
         this.content = content;
         this.type = type;
@@ -23,8 +23,14 @@ public class Plain implements Result {
         return status;
     }
 
-    @Override
-    public Result status(int status) {
+    /**
+     * 修改状态码，并返回自己<br/>
+     * 注意：当type为REDIRECT时，无法修改状态
+     *
+     * @param status 状态码
+     * @return this
+     */
+    public MutableResult status(int status) {
         if (type() != Type.REDIRECT)
             this.status = status;
         return this;
@@ -35,8 +41,13 @@ public class Plain implements Result {
         return type;
     }
 
-    @Override
-    public Result type(Type type) {
+    /**
+     * 修改类型，并返回自己
+     *
+     * @param type 类型
+     * @return this
+     */
+    public MutableResult type(Type type) {
         this.type = type;
         return this;
     }
@@ -46,8 +57,13 @@ public class Plain implements Result {
         return content;
     }
 
-    @Override
-    public Result content(String content) {
+    /**
+     * 修改内容，并返回自己
+     *
+     * @param content 内容
+     * @return this
+     */
+    public MutableResult content(String content) {
         this.content = content;
         return this;
     }

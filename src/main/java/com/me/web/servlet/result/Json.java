@@ -4,7 +4,7 @@ package com.me.web.servlet.result;
  * User: t.ding
  * Date: 13-1-23
  */
-public class Json extends Plain {
+public class Json extends MutableResult {
     public Json() {
         this(200, "", Type.DATA);
     }

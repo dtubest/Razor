@@ -4,7 +4,7 @@ package com.me.web.servlet.result;
  * User: t.ding
  * Date: 13-1-22
  */
-public class Ok extends Plain {
+public class Ok extends MutableResult {
     public Ok() {
         this("");
     }

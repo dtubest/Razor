@@ -13,10 +13,12 @@ import java.net.URL;
  * User: t.ding
  * Date: 13-1-22
  */
-public class Todo extends Plain {
+public class Todo implements Result {
     private static final Logger log = LoggerFactory.getLogger(Todo.class);
 
     private static final String template;
+
+    private String content;
 
     static {
         String str = "${message}";
@@ -36,8 +38,21 @@ public class Todo extends Plain {
     }
 
     public Todo(String content) {
-        status(501);
-        type(Type.DATA);
-        content(template.replace("${message}", content));
+        this.content = template.replace("${message}", content);
+    }
+
+    @Override
+    public int status() {
+        return 501;
+    }
+
+    @Override
+    public Type type() {
+        return Type.DATA;
+    }
+
+    @Override
+    public String content() {
+        return content;
     }
 }

@@ -6,8 +6,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static com.me.web.servlet.result.Result.Type.DATA;
-
 /**
  * 用户的Controller应该继承自这个类(虽然不是必须的)，ControllerManager会
  * 在继承层次中逐级往上扫描action，但是这个类中的所有方法都不会被扫描
@@ -25,6 +23,8 @@ public class Action {
      * @return HttpServletRequest对象
      */
     public HttpServletRequest request() {
+        if (null == request)
+            request = Request.request();
         return request;
     }
 
@@ -54,6 +54,8 @@ public class Action {
      * @return HttpServletResponse对象
      */
     public HttpServletResponse response() {
+        if (null == response)
+            response = Request.response();
         return response;
     }
 

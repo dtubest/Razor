@@ -84,19 +84,26 @@ public class DispatcherFilter implements Filter {
             throw new RuntimeException("more than one action match to uri "
                     + ((HttpServletRequest) request).getRequestURI());
         } else {
-            Result result = dispatcher.service(mappings[0], (HttpServletRequest) request);
-            if (null == result)
-                result = new Ok();
+            try {
+                Request.request((HttpServletRequest) request);
+                Request.response((HttpServletResponse) response);
 
-            if (result.type() == Result.Type.REDIRECT) {
-                ((HttpServletResponse) response).sendRedirect(result.content());
+                Result result = dispatcher.service(mappings[0], (HttpServletRequest) request);
+                if (null == result)
+                    result = new Ok();
 
-            } else if (result.type() == Result.Type.DATA) {
-                ((HttpServletResponse) response).setStatus(result.status());
-                response.getWriter().write(result.content());
+                if (result.type() == Result.Type.REDIRECT) {
+                    ((HttpServletResponse) response).sendRedirect(result.content());
 
-            } else {
-                engine.render((View) result, (HttpServletRequest) request, (HttpServletResponse) response);
+                } else if (result.type() == Result.Type.DATA) {
+                    ((HttpServletResponse) response).setStatus(result.status());
+                    response.getWriter().write(result.content());
+
+                } else {
+                    engine.render((View) result, (HttpServletRequest) request, (HttpServletResponse) response);
+                }
+            } finally {
+                Request.clear();
             }
         }
     }

@@ -41,17 +41,6 @@ class MutableResult implements Result {
         return type;
     }
 
-//    /**
-//     * 修改类型，并返回自己
-//     *
-//     * @param type 类型
-//     * @return this
-//     */
-//    public MutableResult type(Type type) {
-//        this.type = type;
-//        return this;
-//    }
-
     @Override
     public String content() {
         return content;

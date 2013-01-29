@@ -14,8 +14,8 @@ import javax.servlet.http.HttpServletResponse;
  * Date: 13-1-10
  */
 public class Action {
-    private HttpServletRequest request = null;
-    private HttpServletResponse response = null;
+    private HttpServletRequest request;
+    private HttpServletResponse response;
 
     /**
      * 获取HttpServletRequest对象
@@ -43,9 +43,11 @@ public class Action {
      *
      * @param name  attribute名
      * @param value attribute值
+     * @return Action对象this
      */
-    public void request(String name, Object value) {
+    public Action request(String name, Object value) {
         request.setAttribute(name, value);
+        return this;
     }
 
     /**
@@ -88,9 +90,11 @@ public class Action {
      * 设置cookie
      *
      * @param cookie Cookie对象
+     * @return Action对象本身
      */
-    public void cookie(Cookie cookie) {
+    public Action cookie(Cookie cookie) {
         response.addCookie(cookie);
+        return this;
     }
 
     /**
@@ -103,24 +107,6 @@ public class Action {
 
     public Cookie[] cookies() {
         return request.getCookies();
-    }
-
-    /**
-     * 创建名称为name的视图
-     *
-     * @param name 视图名
-     */
-    public View view(String name) {
-        return new View(name);
-    }
-
-    /**
-     * 创建一个空的Json对象：{}
-     *
-     * @return 空Json对象
-     */
-    public Json json() {
-        return new Json();
     }
 
     /**
@@ -143,46 +129,22 @@ public class Action {
     }
 
     /**
-     * 将view状态码修改为200，并返回view
+     * 创建名称为name的视图
      *
-     * @param view 视图
-     * @return view
+     * @param name 视图名
      */
-    public View ok(View view) {
-        view.status(200);
-        return view;
+    public View view(String name) {
+        return new View(name);
     }
 
     /**
-     * 将json状态码修改为200，并返回json
+     * 创建一个空的Json对象：{}
      *
-     * @param json 视图
-     * @return json
+     * @return 空Json对象
      */
-    public Json ok(Json json) {
-        json.status(200);
-        return json;
+    public Json json() {
+        return new Json();
     }
-
-//    /**
-//     * 构造一个状态码为status的结果
-//     *
-//     * @param status 状态码
-//     * @return 结果
-//     */
-//    public Result status(int status) {
-//        return status(status, "");
-//    }
-//
-//    /**
-//     * 构造一个状态码为status，内容为content的结果
-//     *
-//     * @param status 状态码
-//     * @return 结果
-//     */
-//    public Result status(int status, String content) {
-//        return new MutableResult(status, content, DATA);
-//    }
 
     /**
      * 构造一个Redirect对象
@@ -190,7 +152,7 @@ public class Action {
      * @param uri 重定向目标uri
      * @return Redirect对象
      */
-    public Result redirect(String uri) {
+    public Redirect redirect(String uri) {
         return new Redirect(uri);
     }
 }

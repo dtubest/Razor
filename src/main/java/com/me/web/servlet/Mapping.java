@@ -2,6 +2,7 @@ package com.me.web.servlet;
 
 import com.me.web.servlet.annotation.Path;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.regex.Pattern;
 
@@ -29,7 +30,21 @@ public class Mapping {
         return pattern.matcher(uri).matches();
     }
 
-    public int getPathParamIndex(String name) {
+    public String getParam(String paramName, HttpServletRequest request) {
+        int i = getPathParamIndex(paramName);
+
+        String parameter;
+        if (-1 != i)
+            parameter = request.getRequestURI().split(Http.uri_separator)[i + 1];
+        else
+            parameter = request.getParameter(paramName);
+
+        return parameter;
+    }
+
+    ////////////////////////////////////////////////////
+
+    private int getPathParamIndex(String name) {
         Pattern pattern = Pattern.compile("\\{" + name + "\\}");
         String[] strings = uri.split("/");
 
@@ -39,8 +54,6 @@ public class Mapping {
         }
         return -1;
     }
-
-    ////////////////////////////////////////////////////
 
     private Pattern getPattern() {
         String innerUri = "^" + uri + "$";

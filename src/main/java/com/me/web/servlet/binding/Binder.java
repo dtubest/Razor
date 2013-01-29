@@ -36,14 +36,7 @@ public abstract class Binder<T> {
     }
 
     public T get(String paramName, HttpServletRequest request, Mapping mapping, T defaultValue) {
-        String parameter;
-        int i = mapping.getPathParamIndex(paramName);
-
-        if (-1 != i)
-            parameter = request.getRequestURI().split(Http.uri_separator)[i + 1];
-        else
-            parameter = request.getParameter(paramName);
-
+        String parameter = mapping.getParam(paramName, request);
         if (StringUtils.isEmpty(parameter))
             return defaultValue;
 

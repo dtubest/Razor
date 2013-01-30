@@ -11,6 +11,9 @@ public final class Http {
     public static final String uri_separator = "/";
     public static final Pattern pathPattern = Pattern.compile("^/?[^?%+\\\\/#&]+(/[^?%+\\\\/#&]+)*/?$");
 
+    /**
+     * private保证这个类永远不会被实例化
+     */
     private Http() {
     }
 }

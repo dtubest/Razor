@@ -67,7 +67,7 @@ public class Dispatcher {
             String name = attr.variableName(i + pos);
             String typeName = parameterTypes[i].getName();
 
-            Binder binder = Binder.binderOf(typeName);
+            Binder binder = Binder.valueOf(typeName);
             Object param = binder.get(name, request, mapping);
             params[i] = param;
         }

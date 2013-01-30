@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 public class BinderTest {
     @Test
     public void test() {
-        Binder<?> binder = Binder.binderOf(String.class.getName());
+        Binder<?> binder = Binder.valueOf(String.class.getName());
         assertThat(binder, CoreMatchers.notNullValue());
 
         Class<FirstController> clazz = FirstController.class;
@@ -28,7 +28,7 @@ public class BinderTest {
             e.printStackTrace();
         }
 
-        binder = Binder.binderOf(Object.class.getName());
+        binder = Binder.valueOf(Object.class.getName());
         assertThat(binder, CoreMatchers.notNullValue());
     }
 }

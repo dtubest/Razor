@@ -50,7 +50,7 @@ public abstract class Binder<T> {
      * @param typeName 类型的全名
      * @return 目标类型binder或者UnsupportedTypeBinder对象
      */
-    public static Binder<?> binderOf(String typeName) {
+    public static Binder<?> valueOf(String typeName) {
         Binder binder = binderMap.get(typeName);
         if (null != binder)
             return binder;

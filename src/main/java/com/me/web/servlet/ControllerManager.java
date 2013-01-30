@@ -11,7 +11,7 @@ import java.util.*;
  * User: t.ding
  * Date: 12-12-12
  */
-public class ControllerManager {
+class ControllerManager {
     private Set<Mapping> mappings = new HashSet<Mapping>();
 
     public void regControllersByPackage(String pacName) {

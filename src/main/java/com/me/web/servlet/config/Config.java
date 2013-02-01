@@ -45,11 +45,11 @@ public class Config {
 
     ///////////////////////////////////////////
 
-    public String[] getControllerPackages() {
+    public final String[] getControllerPackages() {
         return pac.getPackages();
     }
 
-    public ViewEngine getViewEngine() {
+    public final ViewEngine getViewEngine() {
         return template.createEngine();
     }
 }

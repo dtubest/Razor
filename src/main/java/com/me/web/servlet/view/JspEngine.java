@@ -47,7 +47,7 @@ public class JspEngine implements ViewEngine {
         bindAttrToRequest(view, request);
 
         try {
-            servletContext.getRequestDispatcher(path + view.content() + suffix).forward(request, response);
+            servletContext.getRequestDispatcher(path + view.content() + "." + suffix).forward(request, response);
         } catch (ServletException e) {
             e.printStackTrace();
         } catch (IOException e) {

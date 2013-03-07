@@ -1,6 +1,5 @@
-package com.me.config;
+package com.me.web.servlet.config;
 
-import com.me.web.servlet.config.Template;
 import com.me.web.servlet.view.JspEngine;
 import com.me.web.servlet.view.ViewEngine;
 import org.hamcrest.CoreMatchers;

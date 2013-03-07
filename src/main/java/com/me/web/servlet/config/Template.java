@@ -38,7 +38,7 @@ public class Template {
         return this;
     }
 
-    public ViewEngine createEngine() {
+    ViewEngine createEngine() {
         try {
             ViewEngine ve = engine.newInstance();
             if (null == suffix) {

@@ -16,4 +16,9 @@ public final class Http {
      */
     private Http() {
     }
+
+    public static void validatePath(String path) {
+        if (!Http.pathPattern.matcher(path).matches())
+            throw new RuntimeException("Path value is not valid [" + path + "]");
+    }
 }

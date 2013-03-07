@@ -31,18 +31,25 @@ public class Mapping {
     }
 
     public String getParam(String paramName, HttpServletRequest request) {
-        int i = getPathParamIndex(paramName);
+        if (existPathParam(paramName))
+            return getPathParam(request, paramName);
 
-        String parameter;
-        if (-1 != i)
-            parameter = request.getRequestURI().split(Http.uri_separator)[i + 1];
-        else
-            parameter = request.getParameter(paramName);
-
-        return parameter;
+        return getQueryParam(request, paramName);
     }
 
     ////////////////////////////////////////////////////
+
+    private String getQueryParam(HttpServletRequest request, String paramName) {
+        return request.getParameter(paramName);
+    }
+
+    private String getPathParam(HttpServletRequest request, String paramName) {
+        return request.getRequestURI().split(Http.uri_separator)[getPathParamIndex(paramName) + 1];
+    }
+
+    private boolean existPathParam(String paramName) {
+        return -1 != getPathParamIndex(paramName);
+    }
 
     private int getPathParamIndex(String name) {
         Pattern pattern = Pattern.compile("\\{" + name + "\\}");
@@ -61,27 +68,9 @@ public class Mapping {
     }
 
     private String getPath(Path path, String dName) {
-        if (null == path)
-            return Http.uri_separator + dName;
+        if (null == path) return Http.uri_separator + dName;
+        Http.validatePath(path.value());
 
-        if (path.value() == null || !Http.pathPattern.matcher(path.value()).matches())
-            throw new RuntimeException("Path value is not valid [" + path.value() + "]");
-
-        String result = path.value();
-        char[] chars = result.toCharArray();
-
-        int length;
-        if (result.endsWith(Http.uri_separator))
-            length = chars.length - 1;
-        else
-            length = chars.length;
-
-        StringBuilder builder = new StringBuilder();
-        if (chars[0] != Http.uri_separator_char)
-            builder.append(Http.uri_separator_char);
-
-        builder.append(chars, 0, length);
-        return builder.toString();
+        return Http.uri_separator + path.value().replaceAll("^/|/$", "");
     }
-
 }

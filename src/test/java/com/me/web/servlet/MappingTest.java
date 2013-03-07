@@ -17,5 +17,8 @@ public class MappingTest {
         Mapping mapping = new Mapping(control, control.getMethod("logic3", String.class));
 
         assertThat(mapping, CoreMatchers.notNullValue());
+
+        String testString = "/p1/p2/";
+        assertThat(testString.replaceAll("^/|/$", ""), CoreMatchers.equalTo("p1/p2"));
     }
 }

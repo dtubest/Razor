@@ -1,7 +1,6 @@
 package com.me.web.servlet.binding;
 
 import com.me.util.StringUtils;
-import com.me.web.servlet.Http;
 import com.me.web.servlet.Mapping;
 
 import javax.servlet.http.HttpServletRequest;
